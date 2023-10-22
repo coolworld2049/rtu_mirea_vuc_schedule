@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: RTU MIREA VUC Schedule
-  version: 1.4.9
+  version: 1.0.0
 paths:
   /api/v1/schedule/:
     get:
@@ -360,16 +360,15 @@ components:
     Shape:
       properties:
         rows:
-          anyOf:
-          - type: integer
-          - type: 'null'
+          type: integer
           title: Rows
         cols:
-          anyOf:
-          - type: integer
-          - type: 'null'
+          type: integer
           title: Cols
       type: object
+      required:
+      - rows
+      - cols
       title: Shape
     Subject:
       properties:

@@ -33,11 +33,8 @@ repos:
     language: system
     types: [python]
 
-- repo: local
-  hooks:
   - id: pytest-check
     name: pytest-check
-    stages: [commit]
     types: [python]
     entry: pytest
     language: system

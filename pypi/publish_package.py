@@ -11,7 +11,10 @@ load_dotenv()
 
 
 def publish_package(pypi_username: str, pypi_password: str):
-    subprocess.run(["python", "setup.py", "sdist"], cwd="./schedule_service_client")
+    subprocess.run(
+        ["python", "setup.py", "sdist"],
+        cwd="./rtu_mirea_vuc_schedule_client",
+    )
     subprocess.run(
         [
             "twine",
@@ -22,7 +25,7 @@ def publish_package(pypi_username: str, pypi_password: str):
             "--password",
             pypi_password,
         ],
-        cwd="./schedule_service_client",
+        cwd="./rtu_mirea_vuc_schedule_client",
     )
 
 
@@ -42,7 +45,7 @@ def generate_client():
 
 
 def main():
-    cwd = pathlib.Path("schedule_service_client")
+    cwd = pathlib.Path("rtu_mirea_vuc_schedule_client")
     if cwd.exists():
         raise Exception(f"Remove dir {cwd}")
 

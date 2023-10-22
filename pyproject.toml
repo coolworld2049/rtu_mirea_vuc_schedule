@@ -1,9 +1,9 @@
 [tool.poetry]
 authors = ["coolworld2049 <coolworld2049@gmail.com>"]
 description = ""
-name = "schedule_service"
+name = "rtu_mirea_vuc_schedule"
 readme = "README.md"
-version = "1.4.9"
+version = "1.0.0"
 
 [tool.poetry.dependencies]
 apscheduler = "^3.10.4"
