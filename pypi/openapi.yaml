@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: RTU MIREA VUC Schedule
-  version: 1.0.0
+  version: 1.0.1
 paths:
   /api/v1/schedule/:
     get:

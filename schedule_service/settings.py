@@ -2,6 +2,7 @@ import pathlib
 from pathlib import Path
 from tempfile import gettempdir
 
+import toml
 import yaml
 from dotenv import load_dotenv
 from loguru import logger
@@ -105,6 +106,12 @@ class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
     pypi_password: str | None = None
 
     _prometheus_dir: Path = TEMP_DIR / "prom"
+    _pyproject_file: dict = toml.loads(
+        pathlib.Path(__file__)
+        .parent.parent.joinpath("pyproject.toml")
+        .read_text(encoding="utf-8"),
+    )
+    app_version: str = _pyproject_file["tool"]["poetry"]["version"]
 
     @property
     def prometheus_dir(self):
