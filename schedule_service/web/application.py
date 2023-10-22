@@ -1,5 +1,4 @@
 import time
-from importlib import metadata
 
 # noinspection PyProtectedMember
 from cashews import cache
@@ -27,9 +26,10 @@ from schedule_service.web.lifetime import (
 
 def get_app() -> FastAPI:
     configure_logging()
+
     app = FastAPI(
         title="RTU MIREA VUC Schedule",
-        version=metadata.version("schedule_service"),
+        version=settings.app_version,
         docs_url="/api/docs",
         redoc_url="/api/redoc",
         openapi_url="/api/openapi.json",
