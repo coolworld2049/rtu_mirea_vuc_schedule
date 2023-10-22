@@ -1,8 +1,7 @@
 from json import JSONDecodeError
 from typing import Callable
 
-from fastapi import HTTPException
-from fastapi import Query
+from fastapi import HTTPException, Query
 
 from schedule_service.web.api.v1.schedule.schemas import ScheduleParams
 
@@ -12,9 +11,9 @@ def schedule_params(
     week: dict = None,
     platoon: dict = None,
 ) -> Callable[[int | None, int | None, int | None, int | None], ScheduleParams]:
-    _course = {"default": ..., "examples": [4]}
-    _week = {"default": None, "examples": [8]}
-    _platoon = {"default": None, "examples": [222]}
+    _course = {"default": ..., "example": 4}
+    _week = {"default": None, "example": 8}
+    _platoon = {"default": None, "example": 222}
 
     _course.update(**course) if course else None
     _week.update(**week) if week else None

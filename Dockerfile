@@ -1,6 +1,6 @@
-FROM python:3.11.6-slim-bullseye as prod
+FROM python:3.11.6-slim-bullseye as build
 
-RUN pip install poetry==1.4.8
+RUN pip install poetry==1.4.2
 
 RUN poetry config virtualenvs.create false
 
@@ -8,18 +8,22 @@ COPY pyproject.toml poetry.lock /app/
 
 WORKDIR /app
 
-RUN poetry install --only main
+RUN poetry install
 
 COPY . /app/
 
-RUN poetry install --only main
-
-CMD ["/bin/bash", "./start.sh"]
-
-FROM prod as dev
-
 RUN poetry install
 
-FROM prod as workbook_updater
 
-CMD ["python", "-m", "schedule_service.services.workbook_updater"]
+FROM build as workbook_updater
+
+RUN pytest workbook_updater
+
+CMD ["python", "-m", "workbook_updater"]
+
+
+FROM build as schedule_service
+
+RUN pytest schedule_service
+
+CMD ["python", "-m", "schedule_service"]

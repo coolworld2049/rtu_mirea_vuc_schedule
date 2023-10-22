@@ -1,5 +1,6 @@
 from datetime import datetime
 
+# noinspection PyProtectedMember
 from cashews import cache
 from fastapi import APIRouter
 from starlette import status

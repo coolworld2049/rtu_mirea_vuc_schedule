@@ -1,0 +1,11 @@
+version: '3.9'
+
+services:
+  openapi-generator:
+    image: openapitools/openapi-generator-cli:latest
+    command: >
+      generate -i openapi.yaml -g python --library asyncio -o /rtu_mirea_vuc_schedule_client --package-name rtu_mirea_vuc_schedule_client
+    volumes:
+    - ./openapi.yaml:/openapi.yaml
+    - ./rtu_mirea_vuc_schedule_client:/rtu_mirea_vuc_schedule_client
+    env_file: ../.env

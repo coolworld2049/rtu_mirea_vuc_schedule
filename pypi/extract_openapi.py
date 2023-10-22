@@ -14,7 +14,7 @@ parser = argparse.ArgumentParser(prog="extract_openapi.py")
 parser.add_argument(
     "--app",
     help='App import string. Eg. "main:app"',
-    default="src.web.application:get_app",
+    default="schedule_service.web.application:get_app",
 )
 parser.add_argument(
     "--app-dir",
@@ -31,7 +31,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     _toml = toml.loads(
-        pathlib.Path("../../pyproject.toml").read_text(encoding="utf-8")
+        pathlib.Path("../pyproject.toml").read_text(encoding="utf-8"),
     )
 
     if args.app_dir is not None:

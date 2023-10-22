@@ -1,3 +1,4 @@
+# noinspection PyProtectedMember
 from cashews import cache
 from fastapi import APIRouter
 from fastapi.params import Depends
@@ -5,10 +6,10 @@ from starlette.requests import Request
 
 from schedule_service.services.vuc_schedule_parser.dependency import get_schedule_parser
 from schedule_service.services.vuc_schedule_parser.parser.schemas import (
-    ScheduleResult,
-    WeekScheduleResult,
     Platoon,
+    ScheduleResult,
     WeekDate,
+    WeekScheduleResult,
 )
 from schedule_service.web.api.v1.schedule.params import schedule_params
 from schedule_service.web.api.v1.schedule.schemas import ScheduleParams
@@ -29,7 +30,7 @@ async def get_schedule(
     params: ScheduleParams = Depends(
         schedule_params(
             week={"include_in_schema": False},
-        )
+        ),
     ),
 ) -> list[ScheduleResult]:
     schedule_parser = get_schedule_parser(request, params.course)
@@ -67,7 +68,7 @@ async def get_days_week(
         schedule_params(
             week={"include_in_schema": False},
             platoon={"default": None},
-        )
+        ),
     ),
 ) -> list[WeekDate]:
     schedule_parser = get_schedule_parser(request, params.course)
@@ -87,7 +88,7 @@ async def get_platoons(
         schedule_params(
             week={"include_in_schema": False},
             platoon={"include_in_schema": False},
-        )
+        ),
     ),
     speciality_code: int = None,
 ) -> list[Platoon]:

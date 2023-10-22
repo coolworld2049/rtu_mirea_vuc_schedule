@@ -9,8 +9,8 @@ from schedule_service.services.vuc_schedule_parser.parser.utils import MONTH_MAP
 
 
 class Shape(BaseModel):
-    rows: int | None = None
-    cols: int | None = None
+    rows: int
+    cols: int
 
 
 class WorkbookSettings(BaseModel):

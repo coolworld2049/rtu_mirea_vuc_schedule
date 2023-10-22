@@ -10,13 +10,13 @@ from schedule_service.services.vuc_schedule_parser.parser.exceptions import (
     WorksheetCount,
 )
 from schedule_service.services.vuc_schedule_parser.parser.schemas import (
+    Day,
+    Platoon,
+    ScheduleResult,
     Subject,
+    WeekDate,
     WeekSchedule,
     WeekScheduleResult,
-    ScheduleResult,
-    Platoon,
-    WeekDate,
-    Day,
     WorkbookSettings,
 )
 
@@ -86,7 +86,7 @@ class ScheduleParser:
                 sheet.cell(
                     row=self._workbook_settings(sheet).year_range.rows,
                     column=self._workbook_settings(sheet).year_range.cols,
-                ).value
+                ).value,
             )
             .split(" ")[-3]
             .split("/")
@@ -117,11 +117,13 @@ class ScheduleParser:
             for merged_range in sheet.merged_cells.ranges:
                 if cell.coordinate in merged_range:
                     cell = sheet.cell(
-                        row=merged_range.min_row, column=merged_range.min_col
+                        row=merged_range.min_row,
+                        column=merged_range.min_col,
                     )
                     if not cell.value:
                         cell = sheet.cell(
-                            row=merged_range.max_row, column=merged_range.max_col
+                            row=merged_range.max_row,
+                            column=merged_range.max_col,
                         )
                     break
         return cell
@@ -168,7 +170,7 @@ class ScheduleParser:
                     min_col=sheet.min_column + 1,
                     max_col=sheet.max_column,
                     values_only=True,
-                )
+                ),
             )
             for platoon_name in platoon_names[0]:
                 if platoon_name is not None:
@@ -180,7 +182,8 @@ class ScheduleParser:
             _platoon_number = Platoon.parse_platoon_number(unique_platoon)
             _specialty_code = Platoon.parse_speciality_code(unique_platoon)
             platoon = Platoon(
-                platoon_number=_platoon_number, specialty_code=_specialty_code
+                platoon_number=_platoon_number,
+                specialty_code=_specialty_code,
             )
             logger.debug(f"platoon '{platoon.model_dump()}'")
             if speciality_code:
@@ -221,20 +224,20 @@ class ScheduleParser:
                         + workbook_settings.day_range.cols
                         - workbook_settings.platoon_column_number,
                         values_only=True,
-                    )
+                    ),
                 )
                 platoons = list(
                     filter(
                         lambda c: c[0] if len(c) > 0 else None,
                         day_platoons_cells,
-                    )
+                    ),
                 )
                 day = Day(day=day_cell.value, platoons=[])
                 for i, pl in enumerate(platoons):
 
                     def _log():
                         logger.debug(
-                            f"day '{day.day}' platoon_number '{platoon_number}'"
+                            f"day '{day.day}' platoon_number '{platoon_number}'",
                         )
 
                     platoon_number = Platoon.parse_platoon_number(pl[0])
@@ -252,8 +255,6 @@ class ScheduleParser:
         return result
 
     def parse_schedule(self, week: int, platoon: int = None, **kwargs):
-        if not week:
-            raise ValueError("week required")
         sheet = self.workbook.active
         workbook_settings = self._workbook_settings(sheet)
         result: list[WeekScheduleResult] = []
@@ -302,7 +303,7 @@ class ScheduleParser:
                     + workbook_settings.day_range.cols
                     - workbook_settings.platoon_column_number,
                     values_only=False,
-                )
+                ),
             )
             day_platoon_schedules = [
                 _day_ranges[idx]
@@ -321,7 +322,7 @@ class ScheduleParser:
                             sheet,
                             pl_cell,
                             max_col=day_platoon_col_max,
-                        )
+                        ),
                     )
                 coordinates = (pl_cells[0].coordinate, pl_cells[-1].coordinate)
                 date = pl_cells[0].value
@@ -352,7 +353,7 @@ class ScheduleParser:
                         workbook_settings.subject_rows_number,
                     ):
                         lesson = Subject.parse_auditory(
-                            subject_cell_values[subject_cvi + 1]
+                            subject_cell_values[subject_cvi + 1],
                         )
                         if subject_cell_values[subject_cvi]:
                             subjects.append(
@@ -361,10 +362,11 @@ class ScheduleParser:
                                     auditory=subject_cell_values[subject_cvi + 1],
                                     teacher=subject_cell_values[subject_cvi + 2],
                                     lesson=lesson,
-                                )
+                                ),
                             )
                     datetime = WeekSchedule.parse_date_raw(
-                        date_day_month=date, year_range=self.get_year_range(sheet)
+                        date_day_month=date,
+                        year_range=self.get_year_range(sheet),
                     )
                     week_schedule = WeekSchedule(
                         datetime=datetime,
