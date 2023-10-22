@@ -1,0 +1,76 @@
+version: '3.9'
+
+services:
+  redis:
+    image: bitnami/redis:latest
+    hostname: schedule_service-redis
+    restart: always
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_PORT_NUMBER: ${SCHEDULE_SERVICE_REDIS_PORT}
+    ports:
+      - ${SCHEDULE_SERVICE_REDIS_PORT}
+    healthcheck:
+      test: redis-cli -p ${SCHEDULE_SERVICE_REDIS_PORT} ping
+      interval: 5s
+      timeout: 2s
+      retries: 3
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: prod
+    image: schedule_service:${SCHEDULE_SERVICE_VERSION:-latest}
+    hostname: schedule_service-api
+    restart: always
+    labels:
+      reload.api: "true"
+    env_file:
+      - .env
+    ports:
+      - ${SCHEDULE_SERVICE_PORT}
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      HOST: 0.0.0.0
+      PORT: ${SCHEDULE_SERVICE_PORT}
+      APP_MODULE: ${SCHEDULE_SERVICE_APP_MODULE}
+      MAX_WORKERS: 2
+      SCHEDULE_SERVICE_REDIS_HOST: schedule_service-redis
+      SCHEDULE_SERVICE_LOG_LEVEL: INFO
+      TZ: Europe/Moscow
+    volumes:
+      - ./schedule_service/services/workbook_updater/files:/app/schedule_service/services/workbook_updater/files
+    deploy:
+      mode: replicated
+      replicas: 2
+      endpoint_mode: dnsrr
+  workbook-updater:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: workbook_updater
+    restart: on-failure
+    hostname: schedule_service-workbook_updater
+    depends_on:
+      - api
+    env_file:
+      - .env
+    environment:
+      SCHEDULE_SERVICE_LOG_LEVEL: DEBUG
+    volumes:
+      - ./schedule_service/services/workbook_updater/files:/app/schedule_service/services/workbook_updater/files
+  live-reloader:
+    image: apogiatzis/livereloading
+    container_name: schedule_service-livereloader
+    privileged: true
+    depends_on:
+      - workbook-updater
+    environment:
+      RELOAD_LABEL: reload.api
+      RESTART_TIMEOUT: 2
+      OBSERVER_TYPE: 1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./schedule_service/services/workbook_updater/files:/app/schedule_service/services/workbook_updater/files:ro

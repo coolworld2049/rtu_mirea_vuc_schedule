@@ -1,0 +1,531 @@
+openapi: 3.1.0
+info:
+  title: RTU MIREA VUC
+  version: 1.4.8
+paths:
+  /api/v1/schedule/:
+    get:
+      tags:
+      - schedule
+      summary: Get Schedule
+      operationId: get_schedule_api_v1_schedule__get
+      parameters:
+      - name: course
+        in: query
+        required: true
+        schema:
+          type: integer
+          examples:
+          - 4
+          enum:
+          - 3
+          - 4
+          - 5
+          title: Course
+      - name: platoon
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 222
+          title: Platoon
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ScheduleResult'
+                title: Response Get Schedule Api V1 Schedule  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/schedule/week:
+    get:
+      tags:
+      - schedule
+      summary: Get Week Schedule
+      operationId: get_week_schedule_api_v1_schedule_week_get
+      parameters:
+      - name: course
+        in: query
+        required: true
+        schema:
+          type: integer
+          examples:
+          - 4
+          enum:
+          - 3
+          - 4
+          - 5
+          title: Course
+      - name: week
+        in: query
+        required: true
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 8
+          enum:
+          - 1
+          - 2
+          - 3
+          - 4
+          - 5
+          - 6
+          - 7
+          - 8
+          - 9
+          - 10
+          - 11
+          - 12
+          - 13
+          - 14
+          - 15
+          - 16
+          - 17
+          - 18
+          title: Week
+      - name: platoon
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 222
+          title: Platoon
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeekScheduleResult'
+                title: Response Get Week Schedule Api V1 Schedule Week Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/schedule/day/week:
+    get:
+      tags:
+      - schedule
+      summary: Get Days Week
+      operationId: get_days_week_api_v1_schedule_day_week_get
+      parameters:
+      - name: course
+        in: query
+        required: true
+        schema:
+          type: integer
+          examples:
+          - 4
+          enum:
+          - 3
+          - 4
+          - 5
+          title: Course
+      - name: platoon
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          examples:
+          - 222
+          title: Platoon
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WeekDate'
+                title: Response Get Days Week Api V1 Schedule Day Week Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/schedule/platoons:
+    get:
+      tags:
+      - schedule
+      summary: Get Platoons
+      operationId: get_platoons_api_v1_schedule_platoons_get
+      parameters:
+      - name: speciality_code
+        in: query
+        required: false
+        schema:
+          type: integer
+          title: Speciality Code
+      - name: course
+        in: query
+        required: true
+        schema:
+          type: integer
+          examples:
+          - 4
+          enum:
+          - 3
+          - 4
+          - 5
+          title: Course
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Platoon'
+                title: Response Get Platoons Api V1 Schedule Platoons Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/workbook/:
+    get:
+      tags:
+      - workbook
+      summary: Get Workbooks
+      operationId: get_workbooks_api_v1_workbook__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/WorkbookFile'
+                type: array
+                title: Response Get Workbooks Api V1 Workbook  Get
+  /api/v1/workbook/{course}:
+    get:
+      tags:
+      - workbook
+      summary: Get Course Workbook
+      operationId: get_course_workbook_api_v1_workbook__course__get
+      parameters:
+      - name: course
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Course
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkbookFile'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /api/v1/workbook/relevance/{course}:
+    get:
+      tags:
+      - workbook
+      summary: Get Course Workbook Relevance
+      description: Returns datetime string
+      operationId: get_course_workbook_relevance_api_v1_workbook_relevance__course__get
+      parameters:
+      - name: course
+        in: path
+        required: true
+        schema:
+          type: integer
+          title: Course
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                type: string
+                title: Response Get Course Workbook Relevance Api V1 Workbook Relevance  Course  Get
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /health:
+    get:
+      tags:
+      - healthcheck
+      summary: Health
+      operationId: health_health_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+components:
+  schemas:
+    Day:
+      properties:
+        day:
+          type: string
+          title: Day
+        platoons:
+          items:
+            type: integer
+          type: array
+          title: Platoons
+      type: object
+      required:
+      - day
+      - platoons
+      title: Day
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    Lesson:
+      properties:
+        topic:
+          type: integer
+          title: Topic
+        lesson:
+          type: integer
+          title: Lesson
+        type:
+          type: string
+          title: Type
+      type: object
+      required:
+      - topic
+      - lesson
+      - type
+      title: Lesson
+    Platoon:
+      properties:
+        specialty_code:
+          type: integer
+          title: Specialty Code
+        platoon_number:
+          anyOf:
+          - type: integer
+          - items:
+              type: integer
+            type: array
+          title: Platoon Number
+          default: []
+      type: object
+      required:
+      - specialty_code
+      title: Platoon
+    ScheduleResult:
+      properties:
+        week:
+          type: integer
+          title: Week
+        schedule:
+          items:
+            $ref: '#/components/schemas/WeekScheduleResult'
+          type: array
+          title: Schedule
+      type: object
+      required:
+      - week
+      - schedule
+      title: ScheduleResult
+    Shape:
+      properties:
+        rows:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Rows
+        cols:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          title: Cols
+      type: object
+      title: Shape
+    Subject:
+      properties:
+        name:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Name
+        auditory:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Auditory
+        teacher:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Teacher
+        lesson:
+          anyOf:
+          - $ref: '#/components/schemas/Lesson'
+          - type: 'null'
+      type: object
+      title: Subject
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+    WeekDate:
+      properties:
+        week:
+          type: integer
+          title: Week
+        days:
+          items:
+            $ref: '#/components/schemas/Day'
+          type: array
+          title: Days
+          default: []
+      type: object
+      required:
+      - week
+      title: WeekDate
+    WeekSchedule:
+      properties:
+        date:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Date
+        datetime:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Datetime
+        subjects:
+          items:
+            $ref: '#/components/schemas/Subject'
+          type: array
+          title: Subjects
+        coordinates:
+          prefixItems:
+          - type: string
+          - type: string
+          type: array
+          maxItems: 2
+          minItems: 2
+          title: Coordinates
+      type: object
+      title: WeekSchedule
+    WeekScheduleResult:
+      properties:
+        platoon:
+          $ref: '#/components/schemas/Platoon'
+        schedule:
+          $ref: '#/components/schemas/WeekSchedule'
+      type: object
+      required:
+      - platoon
+      - schedule
+      title: WeekScheduleResult
+    WorkbookFile:
+      properties:
+        course:
+          type: integer
+          title: Course
+        workbook_path:
+          type: string
+          format: path
+          title: Workbook Path
+        workbook_settings_path:
+          type: string
+          format: path
+          title: Workbook Settings Path
+        workbook_settings:
+          additionalProperties:
+            $ref: '#/components/schemas/WorkbookSettings'
+          type: object
+          title: Workbook Settings
+      type: object
+      required:
+      - course
+      - workbook_path
+      - workbook_settings_path
+      - workbook_settings
+      title: WorkbookFile
+    WorkbookSettings:
+      properties:
+        day_range:
+          allOf:
+          - $ref: '#/components/schemas/Shape'
+          default:
+            cols: 8
+            rows: 14
+        year_range:
+          allOf:
+          - $ref: '#/components/schemas/Shape'
+          default:
+            cols: 2
+            rows: 2
+        days_in_week_column_number:
+          type: integer
+          title: Days In Week Column Number
+          default: 5
+        platoon_column_number:
+          type: integer
+          title: Platoon Column Number
+          default: 2
+        subject_rows_number:
+          type: integer
+          title: Subject Rows Number
+          default: 3
+      type: object
+      title: WorkbookSettings

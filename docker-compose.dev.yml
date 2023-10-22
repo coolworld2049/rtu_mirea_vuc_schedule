@@ -1,0 +1,9 @@
+version: '3.9'
+
+services:
+  redis:
+    image: redis/redis-stack:latest
+    hostname: schedule_service-redis
+    ports:
+      - ${SCHEDULE_SERVICE_REDIS_PORT}:6379
+      - "8001:8001"
