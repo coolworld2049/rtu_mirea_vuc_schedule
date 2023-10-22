@@ -37,9 +37,8 @@ def update_version(new_version, setup_py_path):
 
 def generate_client():
     subprocess.run(
-        ["docker-compose", "-f", "docker-compose.yml", "up", "-d"],
+        ["docker-compose", "-f", "docker-compose.yml", "up", "-d", "openapi-generator"],
     )
-    subprocess.run(["docker", "container", "prune", "-f"], shell=True)
 
 
 def main():
@@ -56,10 +55,13 @@ def main():
         new_version=openapi_yaml["info"]["version"],
         setup_py_path=cwd.joinpath("setup.py"),
     )
-    # publish_package(
-    #     pypi_username=os.getenv("SCHEDULE_SERVICE_PYPI_USERNAME"),
-    #     pypi_password=os.getenv("SCHEDULE_SERVICE_PYPI_PASSWORD"),
-    # )
+    publish_package(
+        pypi_username=os.getenv("SCHEDULE_SERVICE_PYPI_USERNAME"),
+        pypi_password=os.getenv("SCHEDULE_SERVICE_PYPI_PASSWORD"),
+    )
+    subprocess.run(
+        ["docker-compose", "-f", "docker-compose.yml", "down", "openapi-generator"],
+    )
 
 
 if __name__ == "__main__":

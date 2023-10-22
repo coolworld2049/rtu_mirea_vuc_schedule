@@ -3,14 +3,13 @@ authors = ["coolworld2049 <coolworld2049@gmail.com>"]
 description = ""
 name = "schedule_service"
 readme = "README.md"
-version = "1.4.8"
+version = "1.4.9"
 
 [tool.poetry.dependencies]
 apscheduler = "^3.10.4"
 beautifulsoup4 = "^4.12.2"
 cashews = { extras = ["redis"], version = "^6.3.0" }
 fastapi = "^0.104.0"
-gunicorn = "^21.2.0"
 httptools = "^0.6.0"
 loguru = "^0.7.0"
 openpyxl = "^3.1.2"
@@ -25,19 +24,29 @@ redis = "^5"
 requests = "^2.31.0"
 tenacity = "^8.2.3"
 toml = "^0.10.2"
-twine = "^4.0.2"
 typing-extensions = "^4.7.1"
 ujson = "^5.8.0"
-uvicorn = "^0.23.2"
+uvicorn = "^0.23"
 yarl = "^1.9.2"
+coverage-badge = "^1.1.0"
+
+[tool.poetry.group.dev.dependencies]
 pytest = "^7.4.2"
 pytest-cov = "^4.1.0"
 pytest-env = "^1.0.1"
+anyio = "3.7.1"
 httpx = "^0.25.0"
+isort = "^5.11.4"
+pre-commit = "^3.0.1"
+wemake-python-styleguide = "^0.17.0"
+black = "^22"
+autoflake = "^1.6.1"
+twine = "^4.0.2"
 
-[build-system]
-build-backend = "poetry.core.masonry.api"
-requires = ["poetry-core>=1.0.0"]
+[tool.isort]
+profile = "black"
+multi_line_output = 3
+src_paths = ["schedule_service",]
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -54,3 +63,7 @@ addopts = ["--cov=./schedule_service", "--ignore=schedule_service/pypi"]
 [tool.coverage.run]
 source = ["./schedule_service"]
 omit = ["dev/*", "tests/*", "pypi/*"]
+
+[build-system]
+build-backend = "poetry.core.masonry.api"
+requires = ["poetry-core>=1.0.0"]

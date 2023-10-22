@@ -10,8 +10,8 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from yarl import URL
 
 from schedule_service.services.vuc_schedule_parser.parser.schemas import (
-    WorkbookSettings,
     WorkbookFile,
+    WorkbookSettings,
 )
 
 load_dotenv()
@@ -20,8 +20,8 @@ TEMP_DIR = Path(gettempdir())
 
 
 class ScheduleParserSettings(BaseSettings):
-    _worksheets_dir: pathlib.Path | str = pathlib.Path(__file__).parent.joinpath(
-        "services/workbook_updater/files"
+    _worksheets_dir: pathlib.Path | str = pathlib.Path(__file__).parent.parent.joinpath(
+        "workbook_updater/files",
     )
 
     @property
@@ -94,9 +94,10 @@ class ScheduleUpdaterSettings(BaseSettings):
 
 
 class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
-    app_module: str = "schedule_service.web.application:get_app()"
+    app_module: str = "schedule_service.web.application:get_app"
     host: str = "127.0.0.1"
     port: int = 8000
+    workers: int = 1
     reload: bool = True
     log_level: str = "DEBUG"
     cors_origins: list[str] | None = ["http://localhost", "http://0.0.0.0"]

@@ -1,0 +1,6 @@
+sheets:
+- name: 3 курс 6 семестр
+  settings:
+    day_range:
+      rows: 14
+      cols: 8

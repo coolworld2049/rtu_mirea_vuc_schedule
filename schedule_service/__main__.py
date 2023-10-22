@@ -38,6 +38,7 @@ def main() -> None:
         host=settings.host,
         port=settings.port,
         reload=settings.reload,
+        workers=settings.workers,
         factory=True,
     )
 

@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: RTU MIREA VUC
-  version: 1.4.8
+  title: RTU MIREA VUC Schedule
+  version: 1.4.9
 paths:
   /api/v1/schedule/:
     get:
@@ -15,13 +15,12 @@ paths:
         required: true
         schema:
           type: integer
-          examples:
-          - 4
           enum:
           - 3
           - 4
           - 5
           title: Course
+        example: 4
       - name: platoon
         in: query
         required: false
@@ -29,9 +28,8 @@ paths:
           anyOf:
           - type: integer
           - type: 'null'
-          examples:
-          - 222
           title: Platoon
+        example: 222
       responses:
         '200':
           description: Successful Response
@@ -60,13 +58,12 @@ paths:
         required: true
         schema:
           type: integer
-          examples:
-          - 4
           enum:
           - 3
           - 4
           - 5
           title: Course
+        example: 4
       - name: week
         in: query
         required: true
@@ -74,8 +71,6 @@ paths:
           anyOf:
           - type: integer
           - type: 'null'
-          examples:
-          - 8
           enum:
           - 1
           - 2
@@ -96,6 +91,7 @@ paths:
           - 17
           - 18
           title: Week
+        example: 8
       - name: platoon
         in: query
         required: false
@@ -103,9 +99,8 @@ paths:
           anyOf:
           - type: integer
           - type: 'null'
-          examples:
-          - 222
           title: Platoon
+        example: 222
       responses:
         '200':
           description: Successful Response
@@ -134,13 +129,12 @@ paths:
         required: true
         schema:
           type: integer
-          examples:
-          - 4
           enum:
           - 3
           - 4
           - 5
           title: Course
+        example: 4
       - name: platoon
         in: query
         required: false
@@ -148,9 +142,8 @@ paths:
           anyOf:
           - type: integer
           - type: 'null'
-          examples:
-          - 222
           title: Platoon
+        example: 222
       responses:
         '200':
           description: Successful Response
@@ -185,13 +178,12 @@ paths:
         required: true
         schema:
           type: integer
-          examples:
-          - 4
           enum:
           - 3
           - 4
           - 5
           title: Course
+        example: 4
       responses:
         '200':
           description: Successful Response
