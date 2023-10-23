@@ -12,7 +12,7 @@ services:
       ALLOW_EMPTY_PASSWORD: yes
       REDIS_PORT_NUMBER: ${SCHEDULE_SERVICE_REDIS_PORT}
     volumes:
-      - ./volumes/redis_data:/bitnami/redis/data
+      - ~/volumes/redis_data:/bitnami/redis/data
   workbook-updater:
     build:
       context: .
