@@ -9,7 +9,7 @@ services:
       - "9090"
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./volumes/prometheus_data:/prometheus
+      - ~/volumes/prometheus_data:/prometheus
     command:
       - "--config.file=/etc/prometheus/prometheus.yml"
     healthcheck:
@@ -30,7 +30,7 @@ services:
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
       - ./monitoring/grafana/provisioning/providers.yml:/etc/grafana/provisioning/dashboards/providers.yml
       - ./monitoring/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
-      - ./volumes/grafana_data:/var/lib/grafana
+      - ~/volumes/grafana_data:/var/lib/grafana
     env_file:
       - .env
     environment:
