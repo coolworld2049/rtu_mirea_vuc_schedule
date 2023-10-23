@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
-  title: RTU MIREA VUC Schedule
-  version: 1.0.1
+  title: rtu mirea vuc schedule
+  version: 1.0.2
 paths:
   /api/v1/schedule/:
     get:
@@ -206,28 +206,14 @@ paths:
       - workbook
       summary: Get Workbooks
       operationId: get_workbooks_api_v1_workbook__get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                items:
-                  $ref: '#/components/schemas/WorkbookFile'
-                type: array
-                title: Response Get Workbooks Api V1 Workbook  Get
-  /api/v1/workbook/{course}:
-    get:
-      tags:
-      - workbook
-      summary: Get Course Workbook
-      operationId: get_course_workbook_api_v1_workbook__course__get
       parameters:
       - name: course
-        in: path
-        required: true
+        in: query
+        required: false
         schema:
-          type: integer
+          anyOf:
+          - type: integer
+          - type: 'null'
           title: Course
       responses:
         '200':
@@ -235,23 +221,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/WorkbookFile'
+                anyOf:
+                - type: array
+                  items:
+                    $ref: '#/components/schemas/WorkbookFile'
+                - $ref: '#/components/schemas/WorkbookFile'
+                title: Response Get Workbooks Api V1 Workbook  Get
         '422':
           description: Validation Error
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/workbook/relevance/{course}:
+  /api/v1/workbook/relevance:
     get:
       tags:
       - workbook
-      summary: Get Course Workbook Relevance
+      summary: Get Workbook Relevance
       description: Returns datetime string
-      operationId: get_course_workbook_relevance_api_v1_workbook_relevance__course__get
+      operationId: get_workbook_relevance_api_v1_workbook_relevance_get
       parameters:
       - name: course
-        in: path
+        in: query
         required: true
         schema:
           type: integer
@@ -263,7 +254,7 @@ paths:
             application/json:
               schema:
                 type: string
-                title: Response Get Course Workbook Relevance Api V1 Workbook Relevance  Course  Get
+                title: Response Get Workbook Relevance Api V1 Workbook Relevance Get
         '422':
           description: Validation Error
           content:
@@ -472,6 +463,12 @@ components:
         course:
           type: integer
           title: Course
+        course_dir:
+          anyOf:
+          - type: string
+            format: path
+          - type: string
+          title: Course Dir
         workbook_path:
           type: string
           format: path
@@ -488,6 +485,7 @@ components:
       type: object
       required:
       - course
+      - course_dir
       - workbook_path
       - workbook_settings_path
       - workbook_settings

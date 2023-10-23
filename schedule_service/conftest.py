@@ -4,7 +4,7 @@ import pytest
 from fastapi import FastAPI
 from httpx import AsyncClient
 
-from schedule_service.services.vuc_schedule_parser.lifetime import get_course_workbooks
+from schedule_service.services.vuc_schedule_parser.lifetime import get_workbook_parsers
 from schedule_service.services.vuc_schedule_parser.parser import ScheduleParser
 from schedule_service.web.application import get_app
 
@@ -34,7 +34,7 @@ def schedule_parser_instance(
     fastapi_app: FastAPI,
     anyio_backend: Any,
 ) -> ScheduleParser:
-    course = 4
-    course_workbooks = get_course_workbooks([course])
+    course = "4-course"
+    course_workbooks = get_workbook_parsers([course])
     schedule_parser = course_workbooks.get(course)
     return schedule_parser

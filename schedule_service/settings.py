@@ -1,4 +1,5 @@
 import pathlib
+import subprocess
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -30,7 +31,7 @@ class ScheduleParserSettings(BaseSettings):
         return self._worksheets_dir
 
     @property
-    def course_workbooks(self):
+    def workbook_files(self):
         workbooks = []
         for course_dir in self._worksheets_dir.iterdir():
             if not course_dir.is_dir():
@@ -51,6 +52,7 @@ class ScheduleParserSettings(BaseSettings):
                 }
                 workbook_file = WorkbookFile(
                     course=int(course_dir.name.split("-")[0]),
+                    course_dir=course_dir.name,
                     workbook_path=workbook_path,
                     workbook_settings_path=settings_file,
                     workbook_settings=worksheet_settings,
@@ -83,18 +85,7 @@ class RedisSettings(BaseSettings):
         )
 
 
-class ScheduleUpdaterSettings(BaseSettings):
-    year: int | str | None = None
-    month: int | str | None = None
-    day: int | str | None = "*/1"
-    week: int | str | None = None
-    day_of_week: int | str | None = None
-    hour: int | str | None = None
-    minute: int | str | None = None
-    second: int | str | None = None
-
-
-class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
+class Settings(RedisSettings, ScheduleParserSettings):
     app_module: str = "schedule_service.web.application:get_app"
     host: str = "127.0.0.1"
     port: int = 8000
@@ -102,8 +93,6 @@ class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
     reload: bool = True
     log_level: str = "DEBUG"
     cors_origins: list[str] | None = ["http://localhost", "http://0.0.0.0"]
-    pypi_username: str | None = None
-    pypi_password: str | None = None
 
     _prometheus_dir: Path = TEMP_DIR / "prom"
     _pyproject_file: dict = toml.loads(
@@ -111,7 +100,14 @@ class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
         .parent.parent.joinpath("pyproject.toml")
         .read_text(encoding="utf-8"),
     )
+    _hostname: bytes = subprocess.check_output(["bash", "-c", "hostname"])
+
+    app_name: str = _pyproject_file["tool"]["poetry"]["name"]
     app_version: str = _pyproject_file["tool"]["poetry"]["version"]
+
+    @property
+    def hostname(self):
+        return self._hostname.decode("utf-8").strip()
 
     @property
     def prometheus_dir(self):
@@ -133,5 +129,4 @@ class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
     )
 
 
-schedule_updater_settings = ScheduleUpdaterSettings()
 settings = Settings()

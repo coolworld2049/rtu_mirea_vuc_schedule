@@ -59,8 +59,8 @@ def main():
         setup_py_path=cwd.joinpath("setup.py"),
     )
     publish_package(
-        pypi_username=os.getenv("SCHEDULE_SERVICE_PYPI_USERNAME"),
-        pypi_password=os.getenv("SCHEDULE_SERVICE_PYPI_PASSWORD"),
+        pypi_username=os.getenv("PYPI_USERNAME"),
+        pypi_password=os.getenv("PYPI_PASSWORD"),
     )
     subprocess.run(
         ["docker-compose", "-f", "docker-compose.yml", "down", "openapi-generator"],

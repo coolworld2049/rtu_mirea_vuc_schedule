@@ -1,11 +1,8 @@
 from datetime import datetime
 
-# noinspection PyProtectedMember
-from cashews import cache
 from fastapi import APIRouter
 from starlette import status
 from starlette.exceptions import HTTPException
-from starlette.requests import Request
 
 from schedule_service.services.vuc_schedule_parser.parser.schemas import WorkbookFile
 from schedule_service.settings import settings
@@ -13,39 +10,27 @@ from schedule_service.settings import settings
 router = APIRouter()
 
 
-@router.get("/", response_model=list[WorkbookFile])
+@router.get("/", response_model=list[WorkbookFile] | WorkbookFile)
 async def get_workbooks(
-    request: Request,
-) -> list[WorkbookFile]:
-    return settings.course_workbooks
-
-
-@router.get("/{course}", response_model=WorkbookFile)
-async def get_course_workbook(
-    request: Request,
-    course: int,
-) -> WorkbookFile:
-    wb = [x for x in settings.course_workbooks if x.course == course]
-    if len(wb) < 1:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
-    return wb[0]
+    course: int | None = None,
+) -> list[WorkbookFile] | WorkbookFile:
+    if course:
+        wb = [x for x in settings.workbook_files if x.course == course]
+        if len(wb) < 1:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        return wb[0]
+    return settings.workbook_files
 
 
 @router.get(
-    "/relevance/{course}",
+    "/relevance",
     response_model=str,
     description="Returns datetime string",
 )
-@cache(
-    ttl="720m",
-    prefix="get_course_workbook_relevance",
-    key="course:{course}",
-    tags=["workbook"],
-)
-async def get_course_workbook_relevance(
+async def get_workbook_relevance(
     course: int,
 ) -> str:
-    wb = [x for x in settings.course_workbooks if x.course == course]
+    wb = [x for x in settings.workbook_files if x.course == course]
     if len(wb) < 1:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     st_mtime = wb[0].workbook_path.stat().st_mtime

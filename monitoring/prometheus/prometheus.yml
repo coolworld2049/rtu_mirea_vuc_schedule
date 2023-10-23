@@ -3,9 +3,9 @@ global:
   scrape_timeout: 10s
   evaluation_interval: 15s
 scrape_configs:
-  - job_name: 'schedule_service-api'
+  - job_name: 'schedule-service'
     scrape_interval: 15s
     scrape_timeout: 10s
     metrics_path: /metrics
     static_configs:
-      - targets: ['schedule_service-api:8000']
+      - targets: ['schedule-service:8000']

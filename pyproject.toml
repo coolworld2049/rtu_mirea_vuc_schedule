@@ -3,7 +3,7 @@ authors = ["coolworld2049 <coolworld2049@gmail.com>"]
 description = ""
 name = "rtu_mirea_vuc_schedule"
 readme = "README.md"
-version = "1.0.1"
+version = "1.0.2"
 
 [tool.poetry.dependencies]
 apscheduler = "^3.10.4"
@@ -42,11 +42,12 @@ wemake-python-styleguide = "^0.17.0"
 black = "^22"
 autoflake = "^1.6.1"
 twine = "^4.0.2"
+locust = "^2.17.0"
 
 [tool.isort]
 profile = "black"
 multi_line_output = 3
-src_paths = ["schedule_service",]
+src_paths = ["schedule_service","workbook_updater",]
 
 [tool.pytest.ini_options]
 filterwarnings = [
@@ -55,14 +56,14 @@ filterwarnings = [
     "ignore:.*unclosed.*:ResourceWarning",
 ]
 testpaths = [
-    "schedule_service/services/vuc_schedule_parser/tests",
-    "schedule_service/services/workbook_updater/tests",
+    "schedule_service/tests",
+    "workbook_updater/tests",
 ]
-addopts = ["--cov=./schedule_service", "--ignore=schedule_service/pypi"]
+addopts = ["--cov=schedule_service", "--cov=workbook_updater", "--ignore=./pypi"]
 
 [tool.coverage.run]
-source = ["./schedule_service"]
-omit = ["dev/*", "tests/*", "pypi/*"]
+source = ["schedule_service", "workbook_updater"]
+omit = ["tests/*"]
 
 [build-system]
 build-backend = "poetry.core.masonry.api"

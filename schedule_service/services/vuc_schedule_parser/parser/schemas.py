@@ -34,6 +34,7 @@ class WorkbookSettings(BaseModel):
 
 class WorkbookFile(BaseModel):
     course: int
+    course_dir: pathlib.Path | str
     workbook_path: pathlib.Path
     workbook_settings_path: pathlib.Path
     workbook_settings: dict[str, WorkbookSettings]
