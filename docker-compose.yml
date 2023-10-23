@@ -1,20 +1,33 @@
 version: '3.9'
 
 services:
-  redis:
+  redis-master:
     image: bitnami/redis:latest
-    hostname: schedule_service-redis
-    restart: always
-    environment:
-      ALLOW_EMPTY_PASSWORD: "yes"
-      REDIS_PORT_NUMBER: ${SCHEDULE_SERVICE_REDIS_PORT}
     ports:
-    - ${SCHEDULE_SERVICE_REDIS_PORT}
-    healthcheck:
-      test: redis-cli -p ${SCHEDULE_SERVICE_REDIS_PORT} ping
-      interval: 5s
-      timeout: 2s
-      retries: 3
+      - ${SCHEDULE_SERVICE_REDIS_PORT}
+    environment:
+      - REDIS_PORT_NUMBER=${SCHEDULE_SERVICE_REDIS_PORT}
+      - REDIS_REPLICATION_MODE=master
+      - REDIS_PASSWORD=${SCHEDULE_SERVICE_REDIS_PASS}
+    volumes:
+      - ./volumes/redis_master_data:/bitnami
+  redis-replica:
+    image: bitnami/redis:latest
+    ports:
+      - ${SCHEDULE_SERVICE_REDIS_PORT}
+    depends_on:
+      - redis-master
+    environment:
+      - REDIS_REPLICATION_MODE=slave
+      - REDIS_MASTER_HOST=redis-master
+      - REDIS_PORT_NUMBER=${SCHEDULE_SERVICE_REDIS_PORT}
+      - REDIS_MASTER_PORT_NUMBER=${SCHEDULE_SERVICE_REDIS_PORT}
+      - REDIS_MASTER_PASSWORD=${SCHEDULE_SERVICE_REDIS_PASS}
+      - REDIS_PASSWORD=${SCHEDULE_SERVICE_REDIS_PASS}
+    deploy:
+      mode: replicated
+      endpoint_mode: dnsrr
+      replicas: 2
   workbook-updater:
     build:
       context: .
@@ -23,11 +36,11 @@ services:
     restart: on-failure
     hostname: schedule_service-workbook_updater
     env_file:
-    - .env
+      - .env
     environment:
       SCHEDULE_SERVICE_LOG_LEVEL: DEBUG
     volumes:
-    - ./workbook_updater/files:/app/workbook_updater/files
+      - ./workbook_updater/files:/app/workbook_updater/files
   api:
     build:
       context: .
@@ -38,87 +51,42 @@ services:
     labels:
       reload.api: "true"
     env_file:
-    - .env
+      - .env
     ports:
-    - ${SCHEDULE_SERVICE_PORT}
+      - ${SCHEDULE_SERVICE_PORT}
     depends_on:
-      redis:
-        condition: service_healthy
-      workbook-updater:
-        condition: service_started
+      - redis-replica
+      - workbook-updater
     environment:
       SCHEDULE_SERVICE_HOST: 0.0.0.0
       SCHEDULE_SERVICE_WORKERS: 1
       SCHEDULE_SERVICE_RELOAD: false
-      SCHEDULE_SERVICE_REDIS_HOST: schedule_service-redis
+      SCHEDULE_SERVICE_REDIS_HOST: redis-replica
       SCHEDULE_SERVICE_LOG_LEVEL: INFO
       TZ: Europe/Moscow
     deploy:
       mode: replicated
       replicas: 4
-      endpoint_mode: vip
+      endpoint_mode: dnsrr
   api-loadbalancer:
     image: nginx:latest
     hostname: schedule_service-api-loadbalancer
     volumes:
-    - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-    - api
+      - api
     ports:
-    - ${SCHEDULE_SERVICE_PORT}:8080
+      - ${SCHEDULE_SERVICE_PORT}:8080
   livereloader:
     image: apogiatzis/livereloading
     hostname: schedule_service-livereloader
     privileged: true
     depends_on:
-    - api
+      - api
     environment:
       RELOAD_LABEL: reload.api
       RESTART_TIMEOUT: 2
       OBSERVER_TYPE: 1
     volumes:
-    - /var/run/docker.sock:/var/run/docker.sock
-    - ./workbook_updater/files:/app/workbook_updater/files
-
-  prometheus:
-    image: prom/prometheus:latest
-    user: "0"
-    hostname: monitoring-prometheus
-    restart: unless-stopped
-    ports:
-      - "9090"
-    volumes:
-      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-      - ./monitoring/prometheus_data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
-    healthcheck:
-      test: [ "CMD", "wget", "-q", "--spider","http://localhost:9090" ]
-      interval: 10s
-      timeout: 15s
-      retries: 10
-      start_period: 40s
-  grafana:
-    image: grafana/grafana:latest
-    user: "0"
-    hostname: monitoring-grafana
-    restart: unless-stopped
-    depends_on:
-      - prometheus
-    ports:
-      - ${GF_EXTERNAL_HTTP_PORT}:3000
-    volumes:
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
-      - ./monitoring/grafana/provisioning/providers.yml:/etc/grafana/provisioning/dashboards/providers.yml
-      - ./monitoring/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
-      - ./monitoring/grafana_data:/var/lib/grafana
-    env_file:
-      - .env
-    environment:
-      TZ: Europe/Moscow
-    healthcheck:
-      test: [ "CMD", "curl", "-f", "http://localhost:3000/api/health" ]
-      interval: 10s
-      timeout: 15s
-      retries: 10
-      start_period: 40s
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./workbook_updater/files:/app/workbook_updater/files

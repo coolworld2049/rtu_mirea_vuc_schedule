@@ -7,3 +7,5 @@ services:
     ports:
       - ${SCHEDULE_SERVICE_REDIS_PORT}:6379
       - "8001:8001"
+    environment:
+      REDIS_ARGS: "--requirepass ${SCHEDULE_SERVICE_REDIS_PASS}"

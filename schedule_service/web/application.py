@@ -1,7 +1,6 @@
 import time
 
 # noinspection PyProtectedMember
-from cashews import cache
 from cashews.contrib.fastapi import (
     CacheDeleteMiddleware,
     CacheEtagMiddleware,
@@ -49,8 +48,6 @@ def get_app() -> FastAPI:
 
     register_startup_event(app)
     register_shutdown_event(app)
-
-    cache.setup(settings.redis_url.__str__(), db=0)
 
     app.include_router(router=api_v1_router)
 

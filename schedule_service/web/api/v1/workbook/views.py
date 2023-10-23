@@ -5,27 +5,25 @@ from cashews import cache
 from fastapi import APIRouter
 from starlette import status
 from starlette.exceptions import HTTPException
-from starlette.requests import Request
 
 from schedule_service.services.vuc_schedule_parser.parser.schemas import WorkbookFile
 from schedule_service.settings import settings
 
 router = APIRouter()
+key_template = "course:{course}"
+cache.setup(settings.redis_url.__str__(), db=1)
 
 
 @router.get("/", response_model=list[WorkbookFile])
-async def get_workbooks(
-    request: Request,
-) -> list[WorkbookFile]:
-    return settings.course_workbooks
+async def get_workbooks() -> list[WorkbookFile]:
+    return settings.workbook_files
 
 
 @router.get("/{course}", response_model=WorkbookFile)
 async def get_course_workbook(
-    request: Request,
     course: int,
 ) -> WorkbookFile:
-    wb = [x for x in settings.course_workbooks if x.course == course]
+    wb = [x for x in settings.workbook_files if x.course == course]
     if len(wb) < 1:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return wb[0]
@@ -39,13 +37,12 @@ async def get_course_workbook(
 @cache(
     ttl="720m",
     prefix="get_course_workbook_relevance",
-    key="course:{course}",
-    tags=["workbook"],
+    key=key_template,
 )
 async def get_course_workbook_relevance(
     course: int,
 ) -> str:
-    wb = [x for x in settings.course_workbooks if x.course == course]
+    wb = [x for x in settings.workbook_files if x.course == course]
     if len(wb) < 1:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     st_mtime = wb[0].workbook_path.stat().st_mtime

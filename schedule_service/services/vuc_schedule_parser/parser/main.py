@@ -254,7 +254,9 @@ class ScheduleParser:
             result.append(week_date)
         return result
 
-    def parse_schedule(self, week: int, platoon: int = None, **kwargs):
+    def parse_schedule(
+        self, week: int, platoon: int = None, **kwargs
+    ) -> list[WeekScheduleResult]:
         sheet = self.workbook.active
         workbook_settings = self._workbook_settings(sheet)
         result: list[WeekScheduleResult] = []

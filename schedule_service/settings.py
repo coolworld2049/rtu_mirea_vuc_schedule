@@ -30,7 +30,7 @@ class ScheduleParserSettings(BaseSettings):
         return self._worksheets_dir
 
     @property
-    def course_workbooks(self):
+    def workbook_files(self):
         workbooks = []
         for course_dir in self._worksheets_dir.iterdir():
             if not course_dir.is_dir():
@@ -83,18 +83,7 @@ class RedisSettings(BaseSettings):
         )
 
 
-class ScheduleUpdaterSettings(BaseSettings):
-    year: int | str | None = None
-    month: int | str | None = None
-    day: int | str | None = "*/1"
-    week: int | str | None = None
-    day_of_week: int | str | None = None
-    hour: int | str | None = None
-    minute: int | str | None = None
-    second: int | str | None = None
-
-
-class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
+class Settings(RedisSettings, ScheduleParserSettings):
     app_module: str = "schedule_service.web.application:get_app"
     host: str = "127.0.0.1"
     port: int = 8000
@@ -133,5 +122,4 @@ class Settings(RedisSettings, ScheduleParserSettings, ScheduleUpdaterSettings):
     )
 
 
-schedule_updater_settings = ScheduleUpdaterSettings()
 settings = Settings()

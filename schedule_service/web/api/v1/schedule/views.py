@@ -1,39 +1,38 @@
-# noinspection PyProtectedMember
 from cashews import cache
 from fastapi import APIRouter
 from fastapi.params import Depends
-from starlette.requests import Request
 
-from schedule_service.services.vuc_schedule_parser.dependency import get_schedule_parser
+from schedule_service.services.vuc_schedule_parser.dependency import (
+    get_workbook_parsers,
+)
+from schedule_service.services.vuc_schedule_parser.parser import ScheduleParser
 from schedule_service.services.vuc_schedule_parser.parser.schemas import (
     Platoon,
     ScheduleResult,
     WeekDate,
     WeekScheduleResult,
 )
+from schedule_service.settings import settings
 from schedule_service.web.api.v1.schedule.params import schedule_params
 from schedule_service.web.api.v1.schedule.schemas import ScheduleParams
 
 router = APIRouter()
-cache_key = "params:{params}"
+
+key_template = ":params:{params}"
+cache.setup(settings.redis_url.__str__(), db=0)
 
 
 @router.get("/", response_model=list[ScheduleResult])
-@cache(
-    ttl="1d",
-    prefix="get_schedule",
-    key=cache_key,
-    tags=["schedule"],
-)
+@cache(ttl="1d", prefix="get_schedule", key=key_template)
 async def get_schedule(
-    request: Request,
     params: ScheduleParams = Depends(
         schedule_params(
             week={"include_in_schema": False},
         ),
     ),
+    workbooks: dict[int, ScheduleParser] = Depends(get_workbook_parsers),
 ) -> list[ScheduleResult]:
-    schedule_parser = get_schedule_parser(request, params.course)
+    schedule_parser = workbooks.get(params.course)
     schedule = schedule_parser.parse_all_schedule(
         **params.model_dump(exclude_none=True)
     )
@@ -41,37 +40,28 @@ async def get_schedule(
 
 
 @router.get("/week", response_model=list[WeekScheduleResult])
-@cache(
-    ttl="1d",
-    prefix="get_weeks_schedule",
-    key=cache_key,
-    tags=["schedule"],
-)
+@cache(ttl="1d", prefix="get_weeks_schedule", key=key_template)
 async def get_week_schedule(
-    request: Request,
     params: ScheduleParams = Depends(schedule_params(week={"default": ...})),
+    workbooks: dict[int, ScheduleParser] = Depends(get_workbook_parsers),
 ) -> list[WeekScheduleResult]:
-    schedule_parser = get_schedule_parser(request, params.course)
+    schedule_parser = workbooks.get(params.course)
     schedule = schedule_parser.parse_schedule(**params.model_dump(exclude_none=True))
     return schedule
 
 
 @router.get("/day/week", response_model=list[WeekDate])
-@cache(
-    ttl="1d",
-    prefix="get_days_week",
-    key=cache_key,
-)
+@cache(ttl="1d", prefix="get_days_week", key=key_template)
 async def get_days_week(
-    request: Request,
     params: ScheduleParams = Depends(
         schedule_params(
             week={"include_in_schema": False},
             platoon={"default": None},
         ),
     ),
+    workbooks: dict[int, ScheduleParser] = Depends(get_workbook_parsers),
 ) -> list[WeekDate]:
-    schedule_parser = get_schedule_parser(request, params.course)
+    schedule_parser = workbooks.get(params.course)
     weeks = schedule_parser.get_days_week(**params.model_dump(exclude_none=True))
     return weeks
 
@@ -80,10 +70,9 @@ async def get_days_week(
 @cache(
     ttl="1d",
     prefix="get_weeks_schedule",
-    key=cache_key + ":speciality_code:{speciality_code}",
+    key=key_template + ":speciality_code:{speciality_code}",
 )
 async def get_platoons(
-    request: Request,
     params: ScheduleParams = Depends(
         schedule_params(
             week={"include_in_schema": False},
@@ -91,7 +80,8 @@ async def get_platoons(
         ),
     ),
     speciality_code: int = None,
+    workbooks: dict[int, ScheduleParser] = Depends(get_workbook_parsers),
 ) -> list[Platoon]:
-    schedule_parser = get_schedule_parser(request, params.course)
+    schedule_parser = workbooks.get(params.course)
     platoons = schedule_parser.platoons(speciality_code)
     return platoons
