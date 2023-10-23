@@ -5,11 +5,11 @@ from schedule_service.services.vuc_schedule_parser.parser import ScheduleParser
 from schedule_service.settings import settings
 
 
-def get_workbook_parsers(courses: list[int] | None = None):
+def get_workbook_parsers(course_dirs: list[str] | None = None):
     workbook_parsers = {}
-    if courses:
+    if course_dirs:
         workbook_files = list(
-            filter(lambda c: c.course in courses, settings.workbook_files),
+            filter(lambda c: c.course_dir in course_dirs, settings.workbook_files),
         )
     else:
         workbook_files = settings.workbook_files
@@ -19,7 +19,7 @@ def get_workbook_parsers(courses: list[int] | None = None):
             workbook_settings=wf.workbook_settings,
             workbook_settings_path=wf.workbook_settings_path,
         )
-        workbook_parsers.update({wf.course: schedule_parser})
+        workbook_parsers.update({wf.course_dir: schedule_parser})
     logger.info("All workbook parsers are loaded")
     return workbook_parsers
 

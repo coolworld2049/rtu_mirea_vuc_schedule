@@ -12,6 +12,8 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/pypi" />
+        <option value="$MODULE_DIR$/schedule_service/tests/vuc_schedule_parser" />
+        <option value="$MODULE_DIR$/schedule_service/tests" />
       </list>
     </option>
   </component>

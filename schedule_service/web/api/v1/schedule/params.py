@@ -1,16 +1,20 @@
-from json import JSONDecodeError
 from typing import Callable
 
-from fastapi import HTTPException, Query
+from fastapi import Query
+from pydantic import BaseModel
 
-from schedule_service.web.api.v1.schedule.schemas import ScheduleParams
+
+class ScheduleParams(BaseModel):
+    course: int
+    week: int | None = None
+    platoon: int | None = None
 
 
 def schedule_params(
     course: dict = None,
     week: dict = None,
     platoon: dict = None,
-) -> Callable[[int | None, int | None, int | None, int | None], ScheduleParams]:
+) -> Callable[[int, int | None, int | None], ScheduleParams]:
     _course = {"default": ..., "example": 4}
     _week = {"default": None, "example": 8}
     _platoon = {"default": None, "example": 222}
@@ -37,14 +41,12 @@ def schedule_params(
             **_platoon,
         ),
     ):
-        try:
-            schedule_params = ScheduleParams(
-                course=course_,
-                week=week_,
-                platoon=platoon_,
-            )
-            return schedule_params
-        except JSONDecodeError:
-            raise HTTPException(400, f"Invalid query params")
+        course_dir = f"{course_}-course"
+        schedule_params = ScheduleParams(
+            course=course_,
+            week=week_,
+            platoon=platoon_,
+        )
+        return schedule_params
 
     return inner

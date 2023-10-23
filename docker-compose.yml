@@ -1,52 +1,35 @@
 version: '3.9'
 
 services:
-  redis-master:
+  redis:
     image: bitnami/redis:latest
+    restart: always
+    command: /opt/bitnami/scripts/redis/run.sh --maxclients 100000
     ports:
       - ${SCHEDULE_SERVICE_REDIS_PORT}
     environment:
-      - REDIS_PORT_NUMBER=${SCHEDULE_SERVICE_REDIS_PORT}
-      - REDIS_REPLICATION_MODE=master
-      - REDIS_PASSWORD=${SCHEDULE_SERVICE_REDIS_PASS}
+      REDIS_AOF_ENABLED: no
+      ALLOW_EMPTY_PASSWORD: yes
+      REDIS_PORT_NUMBER: ${SCHEDULE_SERVICE_REDIS_PORT}
     volumes:
-      - ./volumes/redis_master_data:/bitnami
-  redis-replica:
-    image: bitnami/redis:latest
-    ports:
-      - ${SCHEDULE_SERVICE_REDIS_PORT}
-    depends_on:
-      - redis-master
-    environment:
-      - REDIS_REPLICATION_MODE=slave
-      - REDIS_MASTER_HOST=redis-master
-      - REDIS_PORT_NUMBER=${SCHEDULE_SERVICE_REDIS_PORT}
-      - REDIS_MASTER_PORT_NUMBER=${SCHEDULE_SERVICE_REDIS_PORT}
-      - REDIS_MASTER_PASSWORD=${SCHEDULE_SERVICE_REDIS_PASS}
-      - REDIS_PASSWORD=${SCHEDULE_SERVICE_REDIS_PASS}
-    deploy:
-      mode: replicated
-      endpoint_mode: dnsrr
-      replicas: 2
+      - ./volumes/redis_data:/bitnami/redis/data
   workbook-updater:
     build:
       context: .
       dockerfile: Dockerfile
       target: workbook_updater
     restart: on-failure
-    hostname: schedule_service-workbook_updater
     env_file:
       - .env
     environment:
       SCHEDULE_SERVICE_LOG_LEVEL: DEBUG
     volumes:
       - ./workbook_updater/files:/app/workbook_updater/files
-  api:
+  schedule-service:
     build:
       context: .
       dockerfile: Dockerfile
       target: schedule_service
-    hostname: schedule_service-api
     restart: always
     labels:
       reload.api: "true"
@@ -55,34 +38,27 @@ services:
     ports:
       - ${SCHEDULE_SERVICE_PORT}
     depends_on:
-      - redis-replica
-      - workbook-updater
+      redis:
+        condition: service_started
+      workbook-updater:
+        condition: service_started
     environment:
       SCHEDULE_SERVICE_HOST: 0.0.0.0
       SCHEDULE_SERVICE_WORKERS: 1
-      SCHEDULE_SERVICE_RELOAD: false
-      SCHEDULE_SERVICE_REDIS_HOST: redis-replica
+      SCHEDULE_SERVICE_RELOAD: False
+      SCHEDULE_SERVICE_REDIS_HOST: redis
       SCHEDULE_SERVICE_LOG_LEVEL: INFO
       TZ: Europe/Moscow
     deploy:
       mode: replicated
-      replicas: 4
+      replicas: 2
       endpoint_mode: dnsrr
-  api-loadbalancer:
-    image: nginx:latest
-    hostname: schedule_service-api-loadbalancer
-    volumes:
-      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-    depends_on:
-      - api
-    ports:
-      - ${SCHEDULE_SERVICE_PORT}:8080
   livereloader:
     image: apogiatzis/livereloading
-    hostname: schedule_service-livereloader
     privileged: true
     depends_on:
-      - api
+      schedule-service:
+        condition: service_started
     environment:
       RELOAD_LABEL: reload.api
       RESTART_TIMEOUT: 2

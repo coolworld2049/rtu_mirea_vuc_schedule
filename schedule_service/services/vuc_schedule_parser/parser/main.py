@@ -38,7 +38,7 @@ class ScheduleParser:
             self.load()
 
     def __repr__(self):
-        return f"ScheduleParser(workbook_path={self.workbook_path.name}, workbook_settings_path={self.workbook_settings_path.name})"
+        return f"ScheduleParser(workbook_path={self.workbook_path.name},workbook_settings_path={self.workbook_settings_path.name})"
 
     def __enter__(self):
         self.load()
@@ -151,108 +151,6 @@ class ScheduleParser:
         elif not cell.value:
             return self.find_empty_cell_value(sheet, cell, max_col)
         return cell
-
-    def platoons(self, speciality_code: int | None = None) -> list[Platoon]:
-        sheet = self.workbook.active
-        workbook_settings = self._workbook_settings(sheet)
-        unique_platoons = set()
-        platoon_ranges = self.find_in_sheet(
-            sheet=sheet,
-            data=sheet.iter_rows(values_only=False),
-            query=["взвод"],
-        )
-
-        for platoon_row_cell in platoon_ranges:
-            platoon_names = list(
-                sheet.iter_rows(
-                    min_row=platoon_row_cell.row,
-                    max_row=platoon_row_cell.row,
-                    min_col=sheet.min_column + 1,
-                    max_col=sheet.max_column,
-                    values_only=True,
-                ),
-            )
-            for platoon_name in platoon_names[0]:
-                if platoon_name is not None:
-                    if str(platoon_name[0:2]).isdecimal():
-                        unique_platoons.add(platoon_name)
-        unique_platoons = list(sorted(unique_platoons))
-        platoons = []
-        for unique_platoon in unique_platoons:
-            _platoon_number = Platoon.parse_platoon_number(unique_platoon)
-            _specialty_code = Platoon.parse_speciality_code(unique_platoon)
-            platoon = Platoon(
-                platoon_number=_platoon_number,
-                specialty_code=_specialty_code,
-            )
-            logger.debug(f"platoon '{platoon.model_dump()}'")
-            if speciality_code:
-                if speciality_code == _specialty_code:
-                    platoons.append(platoon)
-            else:
-                platoons.append(platoon)
-
-        return platoons
-
-    def get_days_week(self, platoon: int = None, **kwargs) -> list[WeekDate]:
-        sheet = self.workbook.active
-        workbook_settings = self._workbook_settings(sheet)
-        result: list[WeekDate] = []
-
-        week_ranges = self.find_in_sheet(
-            sheet=sheet,
-            data=sheet.iter_rows(values_only=False),
-            query=self.get_weeks(),
-        )
-        for week_range in week_ranges:
-            week_number = int(str(week_range.value).split(" ")[0])
-            week_date = WeekDate(week=week_number, days=[])
-            for day_row_num in range(
-                week_range.row + 1,
-                week_range.row + workbook_settings.week_range_dim.rows + 1,
-                workbook_settings.day_range.rows,
-            ):
-                day_cell = sheet.cell(row=day_row_num, column=week_range.column)
-                if not day_cell.value:
-                    continue
-                day_platoons_cells = list(
-                    sheet.iter_cols(
-                        min_row=day_row_num + 1,
-                        max_row=day_row_num + 1,
-                        min_col=week_range.column,
-                        max_col=week_range.column
-                        + workbook_settings.day_range.cols
-                        - workbook_settings.platoon_column_number,
-                        values_only=True,
-                    ),
-                )
-                platoons = list(
-                    filter(
-                        lambda c: c[0] if len(c) > 0 else None,
-                        day_platoons_cells,
-                    ),
-                )
-                day = Day(day=day_cell.value, platoons=[])
-                for i, pl in enumerate(platoons):
-
-                    def _log():
-                        logger.debug(
-                            f"day '{day.day}' platoon_number '{platoon_number}'",
-                        )
-
-                    platoon_number = Platoon.parse_platoon_number(pl[0])
-                    if platoon:
-                        if platoon == platoon_number:
-                            _log()
-                            day.platoons.append(platoon_number)
-                            break
-                    else:
-                        _log()
-                        day.platoons.append(platoon_number)
-                if len(day.platoons) > 0:
-                    week_date.days.append(day)
-            result.append(week_date)
-        return result
 
     def parse_schedule(
         self, week: int, platoon: int = None, **kwargs
@@ -413,4 +311,106 @@ class ScheduleParser:
             r = self.parse_schedule(week=week_number, platoon=platoon)
             if r:
                 result.append(ScheduleResult(week=week_number, schedule=r))
+        return result
+
+    def platoons(self, speciality_code: int | None = None) -> list[Platoon]:
+        sheet = self.workbook.active
+        workbook_settings = self._workbook_settings(sheet)
+        unique_platoons = set()
+        platoon_ranges = self.find_in_sheet(
+            sheet=sheet,
+            data=sheet.iter_rows(values_only=False),
+            query=["взвод"],
+        )
+
+        for platoon_row_cell in platoon_ranges:
+            platoon_names = list(
+                sheet.iter_rows(
+                    min_row=platoon_row_cell.row,
+                    max_row=platoon_row_cell.row,
+                    min_col=sheet.min_column + 1,
+                    max_col=sheet.max_column,
+                    values_only=True,
+                ),
+            )
+            for platoon_name in platoon_names[0]:
+                if platoon_name is not None:
+                    if str(platoon_name[0:2]).isdecimal():
+                        unique_platoons.add(platoon_name)
+        unique_platoons = list(sorted(unique_platoons))
+        platoons = []
+        for unique_platoon in unique_platoons:
+            _platoon_number = Platoon.parse_platoon_number(unique_platoon)
+            _specialty_code = Platoon.parse_speciality_code(unique_platoon)
+            platoon = Platoon(
+                platoon_number=_platoon_number,
+                specialty_code=_specialty_code,
+            )
+            logger.debug(f"platoon '{platoon.model_dump()}'")
+            if speciality_code:
+                if speciality_code == _specialty_code:
+                    platoons.append(platoon)
+            else:
+                platoons.append(platoon)
+
+        return platoons
+
+    def get_days_week(self, platoon: int = None, **kwargs) -> list[WeekDate]:
+        sheet = self.workbook.active
+        workbook_settings = self._workbook_settings(sheet)
+        result: list[WeekDate] = []
+
+        week_ranges = self.find_in_sheet(
+            sheet=sheet,
+            data=sheet.iter_rows(values_only=False),
+            query=self.get_weeks(),
+        )
+        for week_range in week_ranges:
+            week_number = int(str(week_range.value).split(" ")[0])
+            week_date = WeekDate(week=week_number, days=[])
+            for day_row_num in range(
+                week_range.row + 1,
+                week_range.row + workbook_settings.week_range_dim.rows + 1,
+                workbook_settings.day_range.rows,
+            ):
+                day_cell = sheet.cell(row=day_row_num, column=week_range.column)
+                if not day_cell.value:
+                    continue
+                day_platoons_cells = list(
+                    sheet.iter_cols(
+                        min_row=day_row_num + 1,
+                        max_row=day_row_num + 1,
+                        min_col=week_range.column,
+                        max_col=week_range.column
+                        + workbook_settings.day_range.cols
+                        - workbook_settings.platoon_column_number,
+                        values_only=True,
+                    ),
+                )
+                platoons = list(
+                    filter(
+                        lambda c: c[0] if len(c) > 0 else None,
+                        day_platoons_cells,
+                    ),
+                )
+                day = Day(day=day_cell.value, platoons=[])
+                for i, pl in enumerate(platoons):
+
+                    def _log():
+                        logger.debug(
+                            f"day '{day.day}' platoon_number '{platoon_number}'",
+                        )
+
+                    platoon_number = Platoon.parse_platoon_number(pl[0])
+                    if platoon:
+                        if platoon == platoon_number:
+                            _log()
+                            day.platoons.append(platoon_number)
+                            break
+                    else:
+                        _log()
+                        day.platoons.append(platoon_number)
+                if len(day.platoons) > 0:
+                    week_date.days.append(day)
+            result.append(week_date)
         return result

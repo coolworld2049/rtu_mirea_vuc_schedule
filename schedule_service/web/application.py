@@ -1,6 +1,6 @@
 import time
 
-# noinspection PyProtectedMember
+from cashews import cache
 from cashews.contrib.fastapi import (
     CacheDeleteMiddleware,
     CacheEtagMiddleware,
@@ -27,7 +27,7 @@ def get_app() -> FastAPI:
     configure_logging()
 
     app = FastAPI(
-        title="RTU MIREA VUC Schedule",
+        title=settings.app_name.replace("_", " "),
         version=settings.app_version,
         docs_url="/api/docs",
         redoc_url="/api/redoc",
@@ -42,9 +42,11 @@ def get_app() -> FastAPI:
         expose_headers=["*"],
     )
 
+    cache.setup(settings.redis_url.__str__())
+
     app.add_middleware(CacheDeleteMiddleware)
-    app.add_middleware(CacheEtagMiddleware)
     app.add_middleware(CacheRequestControlMiddleware)
+    app.add_middleware(CacheEtagMiddleware)
 
     register_startup_event(app)
     register_shutdown_event(app)

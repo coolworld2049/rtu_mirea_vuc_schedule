@@ -1,4 +1,5 @@
 import pathlib
+import subprocess
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -51,6 +52,7 @@ class ScheduleParserSettings(BaseSettings):
                 }
                 workbook_file = WorkbookFile(
                     course=int(course_dir.name.split("-")[0]),
+                    course_dir=course_dir.name,
                     workbook_path=workbook_path,
                     workbook_settings_path=settings_file,
                     workbook_settings=worksheet_settings,
@@ -91,8 +93,6 @@ class Settings(RedisSettings, ScheduleParserSettings):
     reload: bool = True
     log_level: str = "DEBUG"
     cors_origins: list[str] | None = ["http://localhost", "http://0.0.0.0"]
-    pypi_username: str | None = None
-    pypi_password: str | None = None
 
     _prometheus_dir: Path = TEMP_DIR / "prom"
     _pyproject_file: dict = toml.loads(
@@ -100,7 +100,14 @@ class Settings(RedisSettings, ScheduleParserSettings):
         .parent.parent.joinpath("pyproject.toml")
         .read_text(encoding="utf-8"),
     )
+    _hostname: bytes = subprocess.check_output(["bash", "-c", "hostname"])
+
+    app_name: str = _pyproject_file["tool"]["poetry"]["name"]
     app_version: str = _pyproject_file["tool"]["poetry"]["version"]
+
+    @property
+    def hostname(self):
+        return self._hostname.decode("utf-8").strip()
 
     @property
     def prometheus_dir(self):

@@ -3,7 +3,7 @@ version: '3.9'
 services:
   locust:
     image: locustio/locust:latest
-    command: -f /mnt/locust/locustfile.py --host http://schedule_service-api:8000/api/v1
+    command: -f /mnt/locust/locustfile.py --host http://schedule-service:8000/api/v1
     volumes:
       - ./locust/:/mnt/locust
     ports:

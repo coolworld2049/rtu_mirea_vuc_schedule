@@ -34,7 +34,7 @@ def schedule_parser_instance(
     fastapi_app: FastAPI,
     anyio_backend: Any,
 ) -> ScheduleParser:
-    course = 4
+    course = "4-course"
     course_workbooks = get_workbook_parsers([course])
     schedule_parser = course_workbooks.get(course)
     return schedule_parser

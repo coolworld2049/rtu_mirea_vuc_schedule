@@ -162,3 +162,5 @@ cython_debug/
 
 !/src/pypi/schedule_service_client/
 !/pypi/rtu_mirea_vuc_schedule_client/
+!/volumes/
+!/volumes/
