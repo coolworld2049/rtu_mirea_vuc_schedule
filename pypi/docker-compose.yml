@@ -8,4 +8,3 @@ services:
     volumes:
     - ./openapi.yaml:/openapi.yaml
     - ./rtu_mirea_vuc_schedule_client:/rtu_mirea_vuc_schedule_client
-    env_file: ../.env

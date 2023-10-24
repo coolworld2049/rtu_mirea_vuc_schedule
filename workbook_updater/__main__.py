@@ -4,9 +4,9 @@ import requests
 from apscheduler.schedulers.blocking import BlockingScheduler
 from bs4 import BeautifulSoup
 from loguru import logger
-from workbook_updater.settings import settings
 
 from schedule_service._logging import configure_logging
+from workbook_updater.settings import settings
 
 
 class ScheduleWorkbookUpdater:
@@ -49,15 +49,20 @@ def main():
     schedule_downloader = ScheduleWorkbookUpdater()
     schedule_downloader.update_workbooks()
     apscheduler = BlockingScheduler()
-    apscheduler.remove_all_jobs()
     apscheduler.add_job(
         schedule_downloader.update_workbooks,
         trigger="cron",
         id="update_workbooks",
+        replace_existing=True,
         **settings.model_dump(exclude_none=True),
     )
-    apscheduler.start()
+    return apscheduler
 
 
 if __name__ == "__main__":
-    main()
+    apscheduler = main()
+    try:
+        apscheduler.start()
+    except Exception as e:
+        logger.error(e)
+        apscheduler.shutdown(wait=True)

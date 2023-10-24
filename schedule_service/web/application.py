@@ -53,14 +53,6 @@ def get_app() -> FastAPI:
 
     app.include_router(router=api_v1_router)
 
-    @app.get(
-        "/health",
-        tags=["healthcheck"],
-        status_code=status.HTTP_200_OK,
-    )
-    async def health():
-        return {"status": "OK"}
-
     @app.exception_handler(Exception)
     async def exception_handler(request: Request, exc: Exception):
         return JSONResponse(

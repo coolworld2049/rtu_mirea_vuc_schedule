@@ -3,6 +3,8 @@ version: '3.9'
 services:
   redis:
     image: bitnami/redis:latest
+    user: root
+    hostname: schedule-service-redis
     restart: always
     command: /opt/bitnami/scripts/redis/run.sh --maxclients 100000
     ports:
@@ -12,17 +14,16 @@ services:
       ALLOW_EMPTY_PASSWORD: yes
       REDIS_PORT_NUMBER: ${SCHEDULE_SERVICE_REDIS_PORT}
     volumes:
-      - ~/volumes/redis_data:/bitnami/redis/data
+      - ~/volumes/rtu_mirea_vuc_schedule/redis_data:/bitnami/redis/data
   workbook-updater:
     build:
       context: .
       dockerfile: Dockerfile
       target: workbook_updater
     restart: on-failure
+    hostname: workbook-updater
     env_file:
       - .env
-    environment:
-      SCHEDULE_SERVICE_LOG_LEVEL: DEBUG
     volumes:
       - ./workbook_updater/files:/app/workbook_updater/files
   schedule-service:
@@ -31,6 +32,7 @@ services:
       dockerfile: Dockerfile
       target: schedule_service
     restart: always
+    hostname: schedule-service
     labels:
       reload.api: "true"
     env_file:
@@ -56,6 +58,7 @@ services:
   livereloader:
     image: apogiatzis/livereloading
     privileged: true
+    hostname: schedule-service-livereloader
     depends_on:
       schedule-service:
         condition: service_started

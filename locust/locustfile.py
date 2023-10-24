@@ -1,37 +1,37 @@
 import random
 
-from locust import HttpUser, task
+from locust import FastHttpUser, task
 
 course_with_platoons = {
     3: [123, 133, 183],
-    4: [102, 112, 142],
+    4: [222, 232, 242],
     5: [101, 111, 241],
 }
 
-weeks: list[int] = list(range(1, 19))
-
-headers = {
-    "Content-Type": "application/json",
-    "Accept": "application/json",
-}
+weeks: list[int] = list(range(4, 14))
 
 
-class Benchmark(HttpUser):
+def rnd_params():
+    course = random.choice(list(course_with_platoons.keys()))
+    platoon = random.choice(course_with_platoons[course])
+    return course, platoon
+
+
+class Benchmark(FastHttpUser):
     @task(2)
     def test_schedule_week(self):
-        course = random.choice(list(course_with_platoons.keys()))
-        platoon = random.choice(course_with_platoons[course])
-        self.client.get(
+        course, platoon = rnd_params()
+        with self.rest(
+            "GET",
             f"/schedule/week?course={course}&week={random.choice(weeks)}&platoon={platoon}",
-        )
+        ) as resp:
+            pass
 
     @task(1)
     def test_schedule_day_week(self):
-        course = random.choice(list(course_with_platoons.keys()))
-        platoon = random.choice(course_with_platoons[course])
-        self.client.get(f"/schedule/day/week?course={course}&platoon={platoon}")
-
-    @task(1)
-    def test_schedule_platoons(self):
-        course = random.choice(list(course_with_platoons.keys()))
-        self.client.get(f"/schedule/platoons?course={course}")
+        course, platoon = rnd_params()
+        with self.rest(
+            "GET",
+            f"/schedule/day/week?course={course}&platoon={platoon}",
+        ) as resp:
+            pass
