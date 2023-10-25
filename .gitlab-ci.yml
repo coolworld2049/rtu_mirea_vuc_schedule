@@ -14,7 +14,7 @@ test:
     - poetry env use 3.11
     - poetry install
     - cp .env.example .env
-    - poetry run pytest
+    - poetry run pytest /schedule_service/tests
 
 build:
   image: docker:latest
