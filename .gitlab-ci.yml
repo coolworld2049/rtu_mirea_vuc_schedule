@@ -17,17 +17,16 @@ test:
     - poetry run pytest ./schedule_service/tests
 
 build:
-  image: ubuntu:latest
-  only:
-    refs:
-    - master
-  script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-    - export IMAGE="coolworldocker/schedule-service-core"
-    - export TAG="latest"
-    - docker build -t $IMAGE:$TAG .
-    - docker push $IMAGE:$TAG
+  image: docker:latest
   stage: build
+  services:
+    - docker:latest-dind
+  variables:
+    IMAGE_TAG: registry.hub.docker.com/coolworldocker/schedule-service-core:$CI_COMMIT_REF_SLUG
+  script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD registry.hub.docker.com
+    - docker build -t $IMAGE_TAG .
+    - docker push $IMAGE_TAG
 
 deploy_production:
   image: docker:latest
