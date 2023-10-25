@@ -11,7 +11,7 @@ test:
       - master
   script:
     - pip install poetry==1.4.2
-    - poetry use env 3.11
+    - poetry env use 3.11
     - poetry install
     - cp .env.example .env
     - poetry run pytest
