@@ -1,6 +1,6 @@
 stages:
-  - build
   - test
+  - build
   - deploy
 
 test:
@@ -22,7 +22,7 @@ build:
     refs:
     - master
   script:
-    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
     - export IMAGE="coolworldocker/schedule-service"
     - docker build --push -t $IMAGE:$CI_COMMIT_SHORT_SHA -t $IMAGE:$CI_COMMIT_REF_SLUG  --workdir . --file ./Dockerfile --build-context . --target schedule-service
     - export IMAGE="coolworldocker/workbook-updater"
