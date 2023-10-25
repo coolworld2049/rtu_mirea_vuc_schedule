@@ -17,16 +17,16 @@ test:
     - poetry run pytest ./schedule_service/tests
 
 build:
-  image: docker:latest
+  image: ubuntu:latest
   only:
     refs:
     - master
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-    - export IMAGE="coolworldocker/schedule-service"
-    - docker build --push -t $IMAGE:$CI_COMMIT_SHORT_SHA -t $IMAGE:$CI_COMMIT_REF_SLUG  --workdir . --file ./Dockerfile --build-context . --target schedule-service
-    - export IMAGE="coolworldocker/workbook-updater"
-    - docker build --push -t $IMAGE:$CI_COMMIT_SHORT_SHA -t $IMAGE:$CI_COMMIT_REF_SLUG  --workdir . --file ./Dockerfile --build-context . --target workbook-updater
+    - export IMAGE="coolworldocker/schedule-service-core"
+    - export TAG="latest"
+    - docker build -t $IMAGE:$TAG .
+    - docker push $IMAGE:$TAG
   stage: build
 
 deploy_production:
