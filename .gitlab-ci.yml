@@ -1,0 +1,39 @@
+stages:
+  - build
+  - test
+  - deploy
+
+test:
+  stage: test
+  image: python:3.11.6-slim-bullseye
+  only:
+    refs:
+      - master
+  script:
+    - pip install poetry==1.4.2
+    - poetry use env 3.11
+    - poetry install
+    - cp .env.example .env
+    - poetry run pytest
+
+build:
+  image: docker:latest
+  only:
+    refs:
+    - master
+  script:
+    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+    - export IMAGE="coolworldocker/schedule-service"
+    - docker build --push -t $IMAGE:$CI_COMMIT_SHORT_SHA -t $IMAGE:$CI_COMMIT_REF_SLUG  --workdir . --file ./Dockerfile --build-context . --target schedule-service
+    - export IMAGE="coolworldocker/workbook-updater"
+    - docker build --push -t $IMAGE:$CI_COMMIT_SHORT_SHA -t $IMAGE:$CI_COMMIT_REF_SLUG  --workdir . --file ./Dockerfile --build-context . --target workbook-updater
+  stage: build
+
+deploy_production:
+  image: docker:latest
+  only:
+    refs:
+    - master
+  script:
+      - echo "NotImplemented"
+  stage: deploy
