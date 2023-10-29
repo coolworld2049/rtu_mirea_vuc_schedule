@@ -4,21 +4,21 @@ services:
   redis:
     extends:
       service: redis
-      file: docker-compose.override.yml
+      file: docker-compose.yml
     env_file:
       - prod.env
       - ../stack.env
   workbook-updater:
     extends:
       service: workbook-updater
-      file: docker-compose.override.yml
+      file: docker-compose.yml
     env_file:
       - prod.env
       - ../stack.env
   schedule-service:
     extends:
       service: schedule-service
-      file: docker-compose.override.yml
+      file: docker-compose.yml
     env_file:
       - prod.env
       - ../stack.env
@@ -29,6 +29,6 @@ services:
   livereloader:
     extends:
       service: livereloader
-      file: docker-compose.override.yml
+      file: docker-compose.yml
     env_file:
       - ../stack.env
