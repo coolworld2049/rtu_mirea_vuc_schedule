@@ -12,6 +12,8 @@ services:
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ~/volumes/rtu_mirea_vuc_schedule/prometheus_data:/prometheus
+    env_file:
+      - prod.env
   grafana:
     image: grafana/grafana:latest
     user: root
@@ -26,3 +28,5 @@ services:
       - ./monitoring/grafana/provisioning/providers.yml:/etc/grafana/provisioning/dashboards/providers.yml
       - ./monitoring/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
       - ~/volumes/rtu_mirea_vuc_schedule/grafana_data:/var/lib/grafana
+    env_file:
+      - prod.env

@@ -32,16 +32,3 @@ services:
       file: docker-compose.override.yml
     env_file:
       - ../stack.env
-  prometheus:
-    extends:
-      service: prometheus
-      file: docker-compose.monitoring.yml
-    env_file:
-      - ../stack.env
-  grafana:
-    extends:
-      service: grafana
-      file: docker-compose.monitoring.yml
-    env_file:
-      - prod.env
-      - ../stack.env
