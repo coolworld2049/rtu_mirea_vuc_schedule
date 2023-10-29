@@ -7,21 +7,21 @@ services:
       file: docker-compose.yml
     env_file:
       - prod.env
-      - ../stack.env
+      - stack.env
   workbook-updater:
     extends:
       service: workbook-updater
       file: docker-compose.yml
     env_file:
       - prod.env
-      - ../stack.env
+      - stack.env
   schedule-service:
     extends:
       service: schedule-service
       file: docker-compose.yml
     env_file:
       - prod.env
-      - ../stack.env
+      - stack.env
     deploy:
       mode: replicated
       replicas: 2
@@ -31,4 +31,4 @@ services:
       service: livereloader
       file: docker-compose.yml
     env_file:
-      - ../stack.env
+      - stack.env
