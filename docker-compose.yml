@@ -27,13 +27,3 @@ services:
     extends:
       service: livereloader
       file: docker-compose.override.yml
-  prometheus:
-    extends:
-      service: prometheus
-      file: docker-compose.monitoring.yml
-  grafana:
-    extends:
-      service: grafana
-      file: docker-compose.monitoring.yml
-    env_file:
-      - prod.env

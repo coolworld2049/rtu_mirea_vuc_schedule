@@ -32,14 +32,3 @@ services:
       file: docker-compose.yml
     env_file:
       - stack.env
-  prometheus:
-    extends:
-      service: prometheus
-      file: docker-compose.monitoring.yml
-  grafana:
-    extends:
-      service: grafana
-      file: docker-compose.monitoring.yml
-    env_file:
-      - prod.env
-      - stack.env
