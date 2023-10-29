@@ -3,7 +3,8 @@ version: '3.9'
 services:
   prometheus:
     image: prom/prometheus:latest
-    user: "0"
+    command: --config.file=/etc/prometheus/prometheus.yml
+    user: root
     restart: unless-stopped
     hostname: monitoring-prometheus
     ports:
@@ -11,23 +12,17 @@ services:
     volumes:
       - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - ~/volumes/rtu_mirea_vuc_schedule/prometheus_data:/prometheus
-    command:
-      - "--config.file=/etc/prometheus/prometheus.yml"
   grafana:
     image: grafana/grafana:latest
-    user: "0"
+    user: root
     restart: unless-stopped
     hostname: monitoring-grafana
     depends_on:
       - prometheus
     ports:
-      - ${GF_EXTERNAL_HTTP_PORT}:3000
+      - "3000:3000"
     volumes:
       - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
       - ./monitoring/grafana/provisioning/providers.yml:/etc/grafana/provisioning/dashboards/providers.yml
       - ./monitoring/grafana/provisioning/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
       - ~/volumes/rtu_mirea_vuc_schedule/grafana_data:/var/lib/grafana
-    env_file:
-      - .env
-    environment:
-      TZ: Europe/Moscow

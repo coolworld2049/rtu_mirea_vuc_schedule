@@ -10,14 +10,15 @@ services:
   workbook-updater:
     extends:
       service: workbook-updater
-      file: docker-compose.yml
+      file: docker-compose.override.yml
   schedule-service:
     extends:
       service: schedule-service
-      file: docker-compose.yml
+      file: docker-compose.override.yml
     ports:
       - ${SCHEDULE_SERVICE_PORT}:${SCHEDULE_SERVICE_PORT}
     environment:
+      SCHEDULE_SERVICE_HOST: 0.0.0.0
       SCHEDULE_SERVICE_REDIS_PORT: 6379
     deploy:
       mode: global
