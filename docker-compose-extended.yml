@@ -60,10 +60,8 @@ services:
       - -m
       - schedule_service
     depends_on:
-      redis:
-        condition: service_started
-      workbook-updater:
-        condition: service_started
+      - redis
+      - workbook-updater
     deploy:
       mode: replicated
       replicas: 2
