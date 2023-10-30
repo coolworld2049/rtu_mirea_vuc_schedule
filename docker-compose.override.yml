@@ -8,22 +8,22 @@ services:
     restart: always
     command: /opt/bitnami/scripts/redis/run.sh --maxclients 100000
     volumes:
-      - ${HOME}/volumes/rtu_mirea_vuc_schedule/redis_data:/bitnami/redis/data
+      - $HOME/volumes/rtu_mirea_vuc_schedule/redis_data:/bitnami/redis/data
   workbook-updater:
     image: rtu_mirea_vuc_schedule:${RTU_MIREA_VUC_SCHEDULE_IMAGE_VERSION:-latest}
     build:
-      context: ${PWD}
+      context: $PWD
       dockerfile: Dockerfile
       target: rtu_mirea_vuc_schedule
     command: python -m workbook_updater
     restart: on-failure
     hostname: workbook-updater
     volumes:
-      - ${PWD}/workbook_updater/files:/app/workbook_updater/files
+      - $PWD/workbook_updater/files:/app/workbook_updater/files
   schedule-service:
     image: rtu_mirea_vuc_schedule:${RTU_MIREA_VUC_SCHEDULE_IMAGE_VERSION:-latest}
     build:
-      context: ${PWD}
+      context: $PWD
       dockerfile: Dockerfile
       target: rtu_mirea_vuc_schedule
     command: python -m schedule_service
@@ -50,4 +50,4 @@ services:
       OBSERVER_TYPE: 1
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ${PWD}/workbook_updater/files:/app/workbook_updater/files
+      - $PWD/workbook_updater/files:/app/workbook_updater/files

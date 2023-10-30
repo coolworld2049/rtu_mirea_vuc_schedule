@@ -2,8 +2,7 @@ version: "3.9"
 services:
   livereloader:
     depends_on:
-      schedule-service:
-        condition: service_started
+      - schedule-service
     environment:
       OBSERVER_TYPE: "1"
       RELOAD_LABEL: reload.api
