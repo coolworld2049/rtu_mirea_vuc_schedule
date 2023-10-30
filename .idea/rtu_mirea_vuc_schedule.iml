@@ -12,7 +12,6 @@
     <option name="namespacePackageFolders">
       <list>
         <option value="$MODULE_DIR$/pypi" />
-        <option value="$MODULE_DIR$/schedule_service/tests/vuc_schedule_parser" />
         <option value="$MODULE_DIR$/schedule_service/tests" />
         <option value="$MODULE_DIR$/schedule_service/services/vuc_schedule_parser/workbook_updater" />
       </list>

@@ -6,9 +6,6 @@ services:
     command: /opt/bitnami/scripts/redis/run.sh --maxclients 100000
     hostname: schedule-service-redis
     restart: always
-    environment:
-      REDIS_AOF_ENABLED: no
-      ALLOW_EMPTY_PASSWORD: yes
     env_file:
       - prod.env
     volumes:
@@ -19,9 +16,6 @@ services:
     command: python -m schedule_service
     hostname: schedule-service
     restart: always
-    environment:
-      SCHEDULE_SERVICE_HOST: 0.0.0.0
-      SCHEDULE_SERVICE_RELOAD: False
     env_file:
       - prod.env
     ports:
