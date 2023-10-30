@@ -11,3 +11,9 @@ Based on https://github.com/coolworld2049/rtu_mirea_vuc_schedule
 ## monitoring
 
 ![monitoring.png](assets%2Fmonitoring-dashboard.png)
+
+## docker-swarm
+
+![docker-swarm-portainer.png](assets%2Fdocker-swarm-portainer.png)
+
+![docker-swarm-portainer-service.png](assets%2Fdocker-swarm-portainer-service.png)
