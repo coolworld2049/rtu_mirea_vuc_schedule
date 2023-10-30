@@ -80,7 +80,7 @@ class WorkbookUpdaterSettings(BaseSettings):
 
 class RedisSettings(BaseSettings):
     redis_host: str = "localhost"
-    redis_port: int = 6381
+    redis_port: int = 6379
     redis_user: str | None = None
     redis_pass: str | None = None
     redis_base: int | None = None
