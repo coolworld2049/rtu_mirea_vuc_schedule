@@ -2,7 +2,6 @@ import os
 import shutil
 
 import uvicorn
-from loguru import logger
 
 from schedule_service.settings import settings
 
@@ -34,7 +33,6 @@ def set_multiproc_dir() -> None:
 
 def main() -> None:
     set_multiproc_dir()
-    logger.info(f"hostname {settings.hostname}")
     uvicorn.run(
         app=settings.app_module.replace("()", ""),
         host=settings.host,

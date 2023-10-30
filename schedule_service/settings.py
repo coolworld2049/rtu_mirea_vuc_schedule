@@ -1,5 +1,4 @@
 import pathlib
-import subprocess
 from pathlib import Path
 from tempfile import gettempdir
 
@@ -22,8 +21,8 @@ TEMP_DIR = Path(gettempdir())
 
 
 class ScheduleParserSettings(BaseSettings):
-    _worksheets_dir: pathlib.Path | str = pathlib.Path(__file__).parent.parent.joinpath(
-        "workbook_updater/files",
+    _worksheets_dir: pathlib.Path | str = pathlib.Path(__file__).parent.joinpath(
+        "services/vuc_schedule_parser/workbook_updater/files",
     )
 
     @property
@@ -63,6 +62,22 @@ class ScheduleParserSettings(BaseSettings):
         return workbooks
 
 
+class WorkbookUpdaterSettings(BaseSettings):
+    year: int | str | None = None
+    month: int | str | None = None
+    day: int | str | None = "*/1"
+    week: int | str | None = None
+    day_of_week: int | str | None = None
+    hour: int | str | None = "3"
+    minute: int | str | None = None
+    second: int | str | None = None
+
+    model_config = SettingsConfigDict(
+        env_prefix="WORKBOOK_UPDATER_",
+        env_file_encoding="utf-8",
+    )
+
+
 class RedisSettings(BaseSettings):
     redis_host: str = "localhost"
     redis_port: int = 6381
@@ -100,14 +115,9 @@ class Settings(RedisSettings, ScheduleParserSettings):
         .parent.parent.joinpath("pyproject.toml")
         .read_text(encoding="utf-8"),
     )
-    _hostname: bytes = subprocess.check_output(["bash", "-c", "hostname"])
 
     app_name: str = _pyproject_file["tool"]["poetry"]["name"]
     app_version: str = _pyproject_file["tool"]["poetry"]["version"]
-
-    @property
-    def hostname(self):
-        return self._hostname.decode("utf-8").strip()
 
     @property
     def prometheus_dir(self):
@@ -129,4 +139,5 @@ class Settings(RedisSettings, ScheduleParserSettings):
     )
 
 
+workbook_updater_settings = WorkbookUpdaterSettings()
 settings = Settings()

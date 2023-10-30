@@ -2,28 +2,35 @@ version: '3.9'
 
 services:
   redis:
-    extends:
-      service: redis
-      file: docker-compose.override.yml
+    image: bitnami/redis:latest
+    command: /opt/bitnami/scripts/redis/run.sh --maxclients 100000
+    hostname: schedule-service-redis
+    restart: always
+    environment:
+      REDIS_AOF_ENABLED: no
+      ALLOW_EMPTY_PASSWORD: yes
     env_file:
       - prod.env
-  workbook-updater:
-    extends:
-      service: workbook-updater
-      file: docker-compose.override.yml
-    env_file:
-      - prod.env
+    volumes:
+      - redis_data:/bitnami/redis/data
   schedule-service:
-    extends:
-      service: schedule-service
-      file: docker-compose.override.yml
+    image: rtu_mirea_vuc_schedule:${RTU_MIREA_VUC_SCHEDULE_IMAGE_VERSION:-latest}
+    build: ${PWD}
+    command: python -m schedule_service
+    hostname: schedule-service
+    restart: always
+    environment:
+      SCHEDULE_SERVICE_HOST: 0.0.0.0
+      SCHEDULE_SERVICE_RELOAD: False
     env_file:
       - prod.env
+    ports:
+      - "8000"
     deploy:
       mode: replicated
       replicas: 2
       endpoint_mode: dnsrr
-  livereloader:
-    extends:
-      service: livereloader
-      file: docker-compose.override.yml
+    depends_on:
+      - redis
+volumes:
+  redis_data:

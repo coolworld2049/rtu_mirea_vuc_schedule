@@ -41,6 +41,7 @@ repos:
         entry: pytest
         language: system
         pass_filenames: false
+        always_run: false
 
       - id: coverage-badge
         name: coverage-badge
@@ -48,6 +49,7 @@ repos:
         language: system
         types: [python]
         pass_filenames: false
+        always_run: false
 
       - id: extract-openapi
         name: extract-openapi

@@ -25,7 +25,8 @@ def get_workbook_parsers(course_dirs: list[str] | None = None):
 
 
 def init_vuc_schedule_parser(app: FastAPI) -> None:  # pragma: no cover
-    app.state.workbook_parsers = get_workbook_parsers()
+    workbook_parsers = get_workbook_parsers()
+    app.state.workbook_parsers = workbook_parsers
 
 
 def shutdown_vuc_schedule_parser(app: FastAPI) -> None:  # pragma: no cover

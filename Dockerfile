@@ -11,3 +11,5 @@ RUN poetry config virtualenvs.create false
 RUN poetry install -n
 
 COPY . /app/
+
+CMD ["pytohn", "-m", "schedule_service"]

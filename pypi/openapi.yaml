@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: rtu mirea vuc schedule
-  version: 1.0.3
+  version: 1.0.4
 paths:
   /api/v1/schedule/:
     get:
