@@ -20,10 +20,6 @@ services:
       - prod.env
     ports:
       - "8000"
-    deploy:
-      mode: replicated
-      replicas: 2
-      endpoint_mode: dnsrr
     depends_on:
       - redis
 volumes:
