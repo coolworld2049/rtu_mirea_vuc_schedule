@@ -1,10 +1,9 @@
-name: rtu_mirea_vuc_schedule
+version: "3.9"
 services:
   livereloader:
     depends_on:
       schedule-service:
         condition: service_started
-        required: true
     environment:
       OBSERVER_TYPE: "1"
       RELOAD_LABEL: reload.api
@@ -19,13 +18,9 @@ services:
       - type: bind
         source: $PWD/workbook_updater/files
         target: /app/workbook_updater/files
-        bind:
-          create_host_path: true
       - type: bind
         source: /var/run/docker.sock
         target: /var/run/docker.sock
-        bind:
-          create_host_path: true
   redis:
     command:
       - /opt/bitnami/scripts/redis/run.sh
@@ -55,8 +50,6 @@ services:
       - type: bind
         source: C:\Users\coolw/volumes/rtu_mirea_vuc_schedule/redis_data
         target: /bitnami/redis/data
-        bind:
-          create_host_path: true
   schedule-service:
     build:
       context: $PWD
@@ -69,10 +62,8 @@ services:
     depends_on:
       redis:
         condition: service_started
-        required: true
       workbook-updater:
         condition: service_started
-        required: true
     deploy:
       mode: replicated
       replicas: 2
@@ -130,8 +121,6 @@ services:
       - type: bind
         source: $PWD/workbook_updater/files
         target: /app/workbook_updater/files
-        bind:
-          create_host_path: true
 networks:
   default:
     name: rtu_mirea_vuc_schedule_default
