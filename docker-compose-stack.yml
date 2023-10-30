@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  redis:
+    command:
+      - /opt/bitnami/scripts/redis/run.sh
+      - --maxclients
+      - "100000"
+    environment:
+      ALLOW_EMPTY_PASSWORD: "yes"
+      REDIS_AOF_ENABLED: "no"
+      TZ: Europe/Moscow
+    env_file:
+      - stack.env
+    hostname: schedule-service-redis
+    image: bitnami/redis:latest
+    networks:
+      default: null
+    restart: always
+    volumes:
+      - type: volume
+        source: redis_data
+        target: /bitnami/redis/data
+        volume: {}
+  schedule-service:
+    command:
+      - python
+      - -m
+      - schedule_service
+    environment:
+      SCHEDULE_SERVICE_HOST: 0.0.0.0
+      SCHEDULE_SERVICE_LOG_LEVEL: INFO
+      SCHEDULE_SERVICE_REDIS_HOST: schedule-service-redis
+      SCHEDULE_SERVICE_RELOAD: "False"
+      SCHEDULE_SERVICE_WORKERS: "1"
+      TZ: Europe/Moscow
+      WORKBOOK_UPDATER_DAY: '*/1'
+      WORKBOOK_UPDATER_HOUR: "3"
+    env_file:
+      - stack.env
+    hostname: schedule-service
+    image: coolworldocker/rtu_mirea_vuc_schedule:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8000
+        protocol: tcp
+    pull_policy: always
+    restart: always
+networks:
+  default:
+    name: rtu_mirea_vuc_schedule_default
+volumes:
+  redis_data:
+    name: rtu_mirea_vuc_schedule_redis_data

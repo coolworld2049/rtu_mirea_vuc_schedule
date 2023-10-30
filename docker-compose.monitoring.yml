@@ -13,7 +13,7 @@ services:
       - ./monitoring/prometheus:/etc/prometheus/custom
       - prometheus_data:/prometheus
     env_file:
-      - prod.env
+      - stack.env
   grafana:
     user: root
     image: grafana/grafana:latest
@@ -28,7 +28,7 @@ services:
       - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
       - grafana_data:/var/lib/grafana
     env_file:
-      - prod.env
+      - stack.env
 volumes:
   prometheus_data:
   grafana_data:

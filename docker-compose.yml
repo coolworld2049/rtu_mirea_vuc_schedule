@@ -7,20 +7,19 @@ services:
     hostname: schedule-service-redis
     restart: always
     env_file:
-      - prod.env
+      - stack.env
     volumes:
       - redis_data:/bitnami/redis/data
   schedule-service:
-    image: rtu_mirea_vuc_schedule:${RTU_MIREA_VUC_SCHEDULE_IMAGE_VERSION:-latest}
-    build: ${PWD}
+    image: coolworldocker/rtu_mirea_vuc_schedule:${RTU_MIREA_VUC_SCHEDULE_IMAGE_VERSION:-latest}
+    pull_policy: always
+    build: .
     command: python -m schedule_service
     hostname: schedule-service
     restart: always
     env_file:
-      - prod.env
+      - stack.env
     ports:
       - "8000"
-    depends_on:
-      - redis
 volumes:
   redis_data:

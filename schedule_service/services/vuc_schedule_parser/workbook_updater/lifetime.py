@@ -1,6 +1,5 @@
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
-from starlette.datastructures import State
 
 from schedule_service.services.vuc_schedule_parser.lifetime import (
     init_vuc_schedule_parser,
@@ -11,11 +10,11 @@ from schedule_service.services.vuc_schedule_parser.workbook_updater.base import 
 from schedule_service.settings import workbook_updater_settings
 
 
-def init_workbook_updater_job(apscheduler: AsyncIOScheduler, state: State):
+def init_workbook_updater_job(apscheduler: AsyncIOScheduler, app: FastAPI):
     schedule_downloader = WorkbookUpdater()
     apscheduler.add_job(
         schedule_downloader.update_workbooks,
-        kwargs={"func": init_vuc_schedule_parser, "state": state},
+        kwargs={"func": init_vuc_schedule_parser, "app": app},
         trigger="cron",
         id="workbook_updater",
         replace_existing=True,
@@ -25,7 +24,7 @@ def init_workbook_updater_job(apscheduler: AsyncIOScheduler, state: State):
 
 def init_workbook_updater(app: FastAPI) -> None:  # pragma: no cover
     apscheduler = AsyncIOScheduler()
-    init_workbook_updater_job(apscheduler, app.state)
+    init_workbook_updater_job(apscheduler, app)
     apscheduler.start()
     app.state.apscheduler = apscheduler
 
