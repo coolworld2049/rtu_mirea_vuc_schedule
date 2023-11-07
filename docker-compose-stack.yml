@@ -37,11 +37,9 @@ services:
     hostname: schedule-service
     image: coolworldocker/rtu_mirea_vuc_schedule:latest
     networks:
-      default: null
+      - default
     ports:
-      - mode: ingress
-        target: 8000
-        protocol: tcp
+      - "8080:8000"
     restart: always
 networks:
   default:
