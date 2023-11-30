@@ -53,18 +53,18 @@ class Subject(BaseModel):
     lesson: Lesson | None = None
 
     @staticmethod
-    def parse_auditory(auditory: str):
-        if not auditory:
+    def parse_auditory(value: str):
+        if not value:
             return None
         pattern = r"\d+-\d+"
-        match = re.search(pattern, auditory)
+        match = re.search(pattern, value)
         if not match:
             return None
         math_range = match.group().split("-")
         lesson = Lesson(
             topic=int(math_range[0]),
             lesson=int(math_range[1]),
-            type=auditory.split("/")[-1],
+            type=value.split("/")[-1],
         )
         return lesson
 
@@ -115,7 +115,7 @@ class Day(BaseModel):
     platoons: list[int]
 
 
-class WeekDate(BaseModel):
+class DayResult(BaseModel):
     week: int
     days: list[Day] = []
 

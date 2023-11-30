@@ -7,9 +7,9 @@ from schedule_service.services.vuc_schedule_parser.dependency import (
 )
 from schedule_service.services.vuc_schedule_parser.parser import ScheduleParser
 from schedule_service.services.vuc_schedule_parser.parser.schemas import (
+    DayResult,
     Platoon,
     ScheduleResult,
-    WeekDate,
     WeekScheduleResult,
 )
 from schedule_service.web.api.v1.schedule.params import ScheduleParams, schedule_params
@@ -41,14 +41,14 @@ async def get_week_schedule(
     return schedule
 
 
-@router.get("/day/week", response_model=list[WeekDate])
+@router.get("/daily", response_model=list[DayResult])
 @cache(ttl="1d", lock=True)
 async def get_days_week(
     params: ScheduleParams = Depends(
         schedule_params(week={"include_in_schema": False}, platoon={"default": None}),
     ),
     schedule_parser: ScheduleParser = Depends(get_workbook_parsers),
-) -> list[WeekDate]:
+) -> list[DayResult]:
     weeks = schedule_parser.get_days_week(**params.model_dump(exclude_none=True))
     return weeks
 

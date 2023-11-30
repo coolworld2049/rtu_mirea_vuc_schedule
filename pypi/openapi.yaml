@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: rtu mirea vuc schedule
-  version: 1.0.3
+  version: 1.0.5
 paths:
   /api/v1/schedule/:
     get:
@@ -30,6 +30,14 @@ paths:
           - type: 'null'
           title: Platoon
         example: 222
+      - name: where
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Where
       responses:
         '200':
           description: Successful Response
@@ -101,6 +109,14 @@ paths:
           - type: 'null'
           title: Platoon
         example: 222
+      - name: where
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Where
       responses:
         '200':
           description: Successful Response
@@ -117,12 +133,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /api/v1/schedule/day/week:
+  /api/v1/schedule/daily:
     get:
       tags:
       - schedule
       summary: Get Days Week
-      operationId: get_days_week_api_v1_schedule_day_week_get
+      operationId: get_days_week_api_v1_schedule_daily_get
       parameters:
       - name: course
         in: query
@@ -144,6 +160,14 @@ paths:
           - type: 'null'
           title: Platoon
         example: 222
+      - name: where
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Where
       responses:
         '200':
           description: Successful Response
@@ -152,8 +176,8 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/WeekDate'
-                title: Response Get Days Week Api V1 Schedule Day Week Get
+                  $ref: '#/components/schemas/DayResult'
+                title: Response Get Days Week Api V1 Schedule Daily Get
         '422':
           description: Validation Error
           content:
@@ -184,6 +208,14 @@ paths:
           - 5
           title: Course
         example: 4
+      - name: where
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: string
+          - type: 'null'
+          title: Where
       responses:
         '200':
           description: Successful Response
@@ -278,6 +310,21 @@ components:
       - day
       - platoons
       title: Day
+    DayResult:
+      properties:
+        week:
+          type: integer
+          title: Week
+        days:
+          items:
+            $ref: '#/components/schemas/Day'
+          type: array
+          title: Days
+          default: []
+      type: object
+      required:
+      - week
+      title: DayResult
     HTTPValidationError:
       properties:
         detail:
@@ -393,21 +440,6 @@ components:
       - msg
       - type
       title: ValidationError
-    WeekDate:
-      properties:
-        week:
-          type: integer
-          title: Week
-        days:
-          items:
-            $ref: '#/components/schemas/Day'
-          type: array
-          title: Days
-          default: []
-      type: object
-      required:
-      - week
-      title: WeekDate
     WeekSchedule:
       properties:
         date:
