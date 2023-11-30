@@ -32,7 +32,6 @@ async def get_schedule(
         if any(
             [x.lower().strip() in ["зачет", "экзамен"] for x in params.where.split()],
         ):
-            kwargs["reverse_weeks"] = True
             kwargs["week_range"] = [14, 18]
     schedule = schedule_parser.parse_all_schedule(
         **params.model_dump(exclude_none=True), **kwargs

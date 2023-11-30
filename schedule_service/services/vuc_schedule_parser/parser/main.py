@@ -74,14 +74,12 @@ class ScheduleParser:
         return self.workbook_settings.get(sheet_name)
 
     @staticmethod
-    def get_weeks(week: int | list[int, int] | None = None, reverse=False):
+    def get_weeks(week: int | list[int, int] | None = None):
         if not week:
             week = [1, 18]
         weeks = None
         if isinstance(week, list):
             weeks = [f"{x} неделя" for x in range(week[0], week[1] + 1)]
-            if reverse:
-                weeks.reverse()
         elif isinstance(week, int):
             weeks = [f"{week} неделя"]
         return weeks
@@ -179,7 +177,6 @@ class ScheduleParser:
         week: int,
         platoon: int = None,
         where: str = None,
-        reverse_weeks=False,
         **kwargs,
     ) -> list[WeekScheduleResult]:
         sheet: Worksheet = self.workbook.active
@@ -189,7 +186,7 @@ class ScheduleParser:
         week_range = self.find_in_sheet(
             sheet=sheet,
             data=sheet.iter_rows(values_only=False),
-            query=self.get_weeks(week, reverse=reverse_weeks),
+            query=self.get_weeks(week),
         )[0]
         continue_outer = False
 
@@ -338,7 +335,6 @@ class ScheduleParser:
         result: list[ScheduleResult] = []
         for week in self.get_weeks(
             week=week_range,
-            reverse=kwargs.get("reverse_weeks", False),
         ):
             week_number = int(week.split(" ")[0])
             kwargs.update({"week": week_number})
