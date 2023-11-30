@@ -99,6 +99,7 @@ class WeekSchedule(BaseModel):
         month = MONTH_MAPPING.get(month)
         date = f"{day}-{month}"
         if year_range:
+            assert 1 <= month <= 12
             year = year_range[0] if month < 12 else year_range[1]
             date += f"-{datetime.now().year}"
         return date

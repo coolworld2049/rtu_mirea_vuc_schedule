@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 from cashews import cache
 from fastapi import APIRouter
 from fastapi.params import Depends
@@ -25,8 +27,15 @@ async def get_schedule(
     ),
     schedule_parser: ScheduleParser = Depends(get_workbook_parsers),
 ) -> list[ScheduleResult]:
+    kwargs = defaultdict()
+    if params.where:
+        if any(
+            [x.lower().strip() in ["зачет", "экзамен"] for x in params.where.split()],
+        ):
+            kwargs["reverse_weeks"] = True
+            kwargs["week_range"] = [14, 18]
     schedule = schedule_parser.parse_all_schedule(
-        **params.model_dump(exclude_none=True)
+        **params.model_dump(exclude_none=True), **kwargs
     )
     return schedule
 
