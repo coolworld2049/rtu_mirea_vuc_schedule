@@ -51,6 +51,8 @@ services:
       SCHEDULE_SERVICE_REDIS_HOST: redis
       SCHEDULE_SERVICE_LOG_LEVEL: INFO
       TZ: Europe/Moscow
+    volumes:
+      - ./workbook_updater/files:/app/workbook_updater/files
     deploy:
       mode: replicated
       replicas: 2
