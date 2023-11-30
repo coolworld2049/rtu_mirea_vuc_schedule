@@ -90,7 +90,7 @@ class Platoon(BaseModel):
 class WeekSchedule(BaseModel):
     date: str | None = None
     datetime: str | None = None
-    subjects: list[Subject] | None = None
+    subjects: list[Subject] = None
     coordinates: tuple[str, str] = None
 
     @staticmethod
