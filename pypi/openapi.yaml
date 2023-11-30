@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: rtu mirea vuc schedule
-  version: 1.0.5
+  version: 1.0.6
 paths:
   /api/v1/schedule/:
     get:
@@ -453,9 +453,11 @@ components:
           - type: 'null'
           title: Datetime
         subjects:
-          items:
-            $ref: '#/components/schemas/Subject'
-          type: array
+          anyOf:
+          - items:
+              $ref: '#/components/schemas/Subject'
+            type: array
+          - type: 'null'
           title: Subjects
         coordinates:
           prefixItems:

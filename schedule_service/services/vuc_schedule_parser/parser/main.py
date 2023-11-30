@@ -288,7 +288,7 @@ class ScheduleParser:
                     week_schedule = WeekSchedule(
                         datetime=datetime,
                         date=date,
-                        subjects=subjects if len(subjects) > 0 else None,
+                        subjects=subjects,
                         coordinates=coordinates,
                     )
                     platoon_obj = Platoon(

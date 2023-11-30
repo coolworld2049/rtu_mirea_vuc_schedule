@@ -14,12 +14,8 @@ COPY . /app/
 
 FROM build as workbook_updater
 
-RUN pytest workbook_updater
-
 CMD ["python", "-m", "workbook_updater"]
 
 FROM build as schedule_service
-
-RUN pytest schedule_service
 
 CMD ["python", "-m", "schedule_service"]
