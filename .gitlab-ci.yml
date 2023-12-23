@@ -22,26 +22,27 @@ test:
     - poetry run pytest ./schedule_service/tests || exit 1  # Добавлен вывод ошибок и завершение с ошибкой в случае неудачи
 
 build:
-  image: docker:latest
+  image: docker:git
   stage: build
+  only:
+    refs:
+      - master
   services:
-    - docker:latest
+    - docker:dind
   script:
-    - echo "$CI_REGISTRY_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
-    - docker login -u "$CI_REGISTRY_USER" -p "$CI_ACCESS_TOKEN" "$CI_REGISTRY"
+    - docker login -u "$CI_REGISTRY_USER" -p "CI_REGISTRY_TOKEN" $CI_REGISTRY
     - docker build -t $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG .
     - docker push $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG
-  artifacts:
-    paths:
-      - $CI_IMAGE_NAME:$CI_IMAGE_TAG.tar
 
 deploy:
-  image: docker:latest
+  image: docker:git
   stage: deploy
   only:
     refs:
       - master
+  services:
+    - docker:dind
   script:
-    - echo "$CI_REGISTRY_TOKEN" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+    - docker login -u "$CI_REGISTRY_USER" -p "CI_REGISTRY_TOKEN" $CI_REGISTRY
     - docker pull $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG
     - echo "Deployment steps here"
