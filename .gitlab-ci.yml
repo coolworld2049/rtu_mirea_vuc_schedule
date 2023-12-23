@@ -4,12 +4,9 @@ stages:
   - deploy
 
 variables:
-  CI_REGISTRY: registry.gitlab.com  # Локальный реестр GitLab
-  CI_IMAGE_NAME: schedule-service-core
+  CI_REGISTRY: registry.gitlab.com
+  CI_IMAGE_NAME: coolworld2049/schedule-service-core
   CI_IMAGE_TAG: $CI_COMMIT_REF_SLUG
-
-before_script:
-  - docker login -u $CI_JOB_TOKEN -p $CI_JOB_TOKEN $CI_REGISTRY
 
 test:
   stage: test
@@ -30,15 +27,17 @@ build:
   services:
     - docker:latest
   script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
     - docker build -t $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG .
     - docker push $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG
 
-deploy_production:
+deploy:
   image: docker:latest
   only:
     refs:
       - master
   script:
-    - docker pull $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG  # Получаем образ из локального реестра GitLab
-    - echo "Deployment steps here"  # Добавьте шаги развертывания
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - docker pull $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG
+    - echo "Deployment steps here"
   stage: deploy
