@@ -3,6 +3,14 @@ stages:
   - build
   - deploy
 
+variables:
+  CI_REGISTRY: registry.gitlab.com  # Локальный реестр GitLab
+  CI_IMAGE_NAME: schedule-service-core
+  CI_IMAGE_TAG: $CI_COMMIT_REF_SLUG
+
+before_script:
+  - docker login -u $CI_JOB_TOKEN -p $CI_JOB_TOKEN $CI_REGISTRY
+
 test:
   stage: test
   image: python:3.11.6-slim-bullseye
@@ -14,25 +22,23 @@ test:
     - poetry env use 3.11
     - poetry install
     - cp .env.example .env
-    - poetry run pytest ./schedule_service/tests
+    - poetry run pytest ./schedule_service/tests || exit 1  # Добавлен вывод ошибок и завершение с ошибкой в случае неудачи
 
 build:
   image: docker:latest
   stage: build
   services:
     - docker:latest
-  variables:
-    IMAGE_TAG: registry.hub.docker.com/coolworldocker/schedule-service-core:$CI_COMMIT_REF_SLUG
   script:
-    - docker login -u $DOCKER_USER -p $DOCKER_PASSWORD registry.hub.docker.com
-    - docker build -t $IMAGE_TAG .
-    - docker push $IMAGE_TAG
+    - docker build -t $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG .
+    - docker push $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG
 
 deploy_production:
   image: docker:latest
   only:
     refs:
-    - master
+      - master
   script:
-      - echo "NotImplemented"
+    - docker pull $CI_REGISTRY/$CI_IMAGE_NAME:$CI_IMAGE_TAG  # Получаем образ из локального реестра GitLab
+    - echo "Deployment steps here"  # Добавьте шаги развертывания
   stage: deploy
