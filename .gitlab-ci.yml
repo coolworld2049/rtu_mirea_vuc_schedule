@@ -5,7 +5,7 @@ stages:
 
 variables:
   CI_REGISTRY: registry.gitlab.com
-  CI_IMAGE_NAME: $CI_REGISTRY_USER/schedule-service-core
+  CI_IMAGE_NAME: schedule-service-core
 
 test:
   stage: test
@@ -28,8 +28,8 @@ build:
   services:
     - docker:dind
   script:
-    - docker build -t $CI_REGISTRY/$CI_IMAGE_NAME:$CI_COMMIT_REF_SLUG .
-    - docker save -o $CI_IMAGE_NAME.tar $CI_REGISTRY/$CI_IMAGE_NAME:$CI_COMMIT_REF_SLUG
+    - docker build -t $CI_REGISTRY/$CI_REGISTRY_USER/$CI_IMAGE_NAME:$CI_COMMIT_REF_SLUG .
+    - docker save -o $CI_IMAGE_NAME.tar $CI_REGISTRY/$CI_REGISTRY_USER/$CI_IMAGE_NAME:$CI_COMMIT_REF_SLUG
   artifacts:
     paths:
       - $CI_IMAGE_NAME.tar
