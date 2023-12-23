@@ -1,46 +1,47 @@
+default:
+  image: docker:20.10.16
+  services:
+    - docker:20.10.16-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_TOKEN $CI_REGISTRY
+
 stages:
-  - test
   - build
+  - test
+  - release
   - deploy
 
 variables:
-  CI_REGISTRY: registry.gitlab.com
-  CI_IMAGE_NAME: schedule-service-core
+  DOCKER_HOST: tcp://docker:2375
+  DOCKER_TLS_CERTDIR: ""
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+
+build:
+  stage: build
+  script:
+    - docker build --pull -t $CONTAINER_TEST_IMAGE .
+    - docker push $CONTAINER_TEST_IMAGE
 
 test:
   stage: test
-  image: python:3.11.6-slim-bullseye
-  only:
-    refs:
-      - master
   script:
-    - pip install poetry==1.4.2
-    - poetry env use 3.11
-    - poetry install
-    - cp .env.example .env
-    - poetry run pytest ./schedule_service/tests -v --tb=short
-build:
-  image: docker:git
-  stage: build
-  only:
-    refs:
-      - master
-  services:
-    - docker:dind
+    - docker pull $CONTAINER_TEST_IMAGE
+    - docker run $CONTAINER_TEST_IMAGE /script/to/run/tests
+
+release-image:
+  stage: release
   script:
-    - docker build -t $CI_REGISTRY/$CI_REGISTRY_USER/$CI_IMAGE_NAME:$CI_COMMIT_REF_SLUG .
-    - docker save -o $CI_IMAGE_NAME.tar $CI_REGISTRY/$CI_REGISTRY_USER/$CI_IMAGE_NAME:$CI_COMMIT_REF_SLUG
-  artifacts:
-    paths:
-      - $CI_IMAGE_NAME.tar
-deploy:
-  image: docker:git
-  stage: deploy
+    - docker pull $CONTAINER_TEST_IMAGE
+    - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
+    - docker push $CONTAINER_RELEASE_IMAGE
   only:
-    refs:
-      - master
-  services:
-    - docker:dind
-  script:
-    - docker load -i $CI_IMAGE_NAME.tar
-    - echo "Deployment steps here"
+    - main
+
+# deploy:
+#  stage: deploy
+#  script:
+#    - ./deploy.sh
+#  only:
+#    - main
+#  environment: production
