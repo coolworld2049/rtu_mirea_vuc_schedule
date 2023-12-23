@@ -27,7 +27,7 @@ test:
   stage: test
   script:
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker run $CONTAINER_TEST_IMAGE /script/to/run/tests
+    - docker run $CONTAINER_TEST_IMAGE poetry run pytest ./schedule_service/tests -v --tb=short
 
 release-image:
   stage: release
