@@ -61,7 +61,6 @@ deploy:
     - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
     - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
   script:
-    - bashc -c '[ -f .env ] || cp .env.example .env'
     - ssh $SSH_USER@$SSH_HOST 'cd $HOME/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit'
   after_script:
     - rm -rf ~/.ssh
