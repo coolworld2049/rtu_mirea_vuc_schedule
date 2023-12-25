@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     day: int | str | None = "*/1"
     week: int | str | None = None
     day_of_week: int | str | None = None
-    hour: int | str | None = None
+    hour: int | str | None = "3"
     minute: int | str | None = None
     second: int | str | None = None
 

@@ -18,7 +18,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=list[ScheduleResult])
-@cache(ttl="1d")
+@cache(ttl="1d", lock=True)
 async def get_schedule(
     params: ScheduleParams = Depends(
         schedule_params(week={"include_in_schema": False}),
@@ -32,7 +32,7 @@ async def get_schedule(
 
 
 @router.get("/week", response_model=list[WeekScheduleResult])
-@cache(ttl="1d")
+@cache(ttl="1d", lock=True)
 async def get_week_schedule(
     params: ScheduleParams = Depends(schedule_params(week={"default": ...})),
     schedule_parser: ScheduleParser = Depends(get_workbook_parsers),
@@ -42,7 +42,7 @@ async def get_week_schedule(
 
 
 @router.get("/day/week", response_model=list[WeekDate])
-@cache(ttl="1d")
+@cache(ttl="1d", lock=True)
 async def get_days_week(
     params: ScheduleParams = Depends(
         schedule_params(week={"include_in_schema": False}, platoon={"default": None}),
@@ -54,7 +54,7 @@ async def get_days_week(
 
 
 @router.get("/platoons", response_model=list[Platoon])
-@cache(ttl="1d")
+@cache(ttl="1d", lock=True)
 async def get_platoons(
     params: ScheduleParams = Depends(
         schedule_params(

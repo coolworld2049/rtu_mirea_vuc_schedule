@@ -30,7 +30,9 @@ build:
 test:
   stage: test
   script:
+    - apk update && apk add docker-compose
     - docker pull $CONTAINER_TEST_IMAGE
+    - docker
     - docker run $CONTAINER_TEST_IMAGE poetry run pytest ./schedule_service/tests -v --tb=short
 
 release-image:

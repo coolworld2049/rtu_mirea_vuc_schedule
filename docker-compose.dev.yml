@@ -3,6 +3,22 @@ version: '3.9'
 services:
   redis:
     image: redis/redis-stack:latest
+    hostname: schedule-service-redis
     ports:
       - ${SCHEDULE_SERVICE_REDIS_PORT}:6379
       - "8001:8001"
+  workbook-updater:
+    extends:
+      service: workbook-updater
+      file: docker-compose.yml
+  schedule-service:
+    extends:
+      service: schedule-service
+      file: docker-compose.yml
+    ports:
+      - ${SCHEDULE_SERVICE_PORT}:${SCHEDULE_SERVICE_PORT}
+    environment:
+      SCHEDULE_SERVICE_REDIS_PORT: 6379
+    deploy:
+      mode: global
+      replicas: 1

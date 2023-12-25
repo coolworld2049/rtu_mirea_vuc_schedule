@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: rtu mirea vuc schedule
-  version: 1.0.2
+  version: 1.0.3
 paths:
   /api/v1/schedule/:
     get:
@@ -261,18 +261,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /health:
-    get:
-      tags:
-      - healthcheck
-      summary: Health
-      operationId: health_health_get
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema: {}
 components:
   schemas:
     Day:
