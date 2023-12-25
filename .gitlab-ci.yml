@@ -14,9 +14,10 @@ variables:
   DOCKER_TLS_CERTDIR: ""
   CI_REGISTRY: registry.gitlab.com
   CI_REGISTRY_USER: coolworld2049
-  CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
-  CONTAINER_TEST_IMAGE: $CI_REGISTRY/$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY$CI_REGISTRY_IMAGE:latest
+  CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD # 2FA token
+  CI_REGISTRY_IMAGE: rtu_mirea_vuc_schedule
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY/$CI_REGISTRY_USER/$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY/$CI_REGISTRY_USER/$CI_REGISTRY_IMAGE:latest
 
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -30,10 +31,11 @@ build:
 test:
   stage: test
   script:
-    - apk update && apk add docker-compose
     - docker pull $CONTAINER_TEST_IMAGE
-    - docker
-    - docker run $CONTAINER_TEST_IMAGE poetry run pytest ./schedule_service/tests -v --tb=short
+    - docker run $CONTAINER_TEST_IMAGE poetry run pytest ./schedule_service/tests -v --tb=short > pytest.log
+  artifacts:
+    paths:
+      - pytest.log
 
 release-image:
   stage: release
@@ -41,8 +43,6 @@ release-image:
     - docker pull $CONTAINER_TEST_IMAGE
     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
     - docker push $CONTAINER_RELEASE_IMAGE
-  only:
-    - main
 
 # deploy:
 #  stage: deploy
