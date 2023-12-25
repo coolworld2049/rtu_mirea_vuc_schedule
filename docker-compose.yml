@@ -17,6 +17,7 @@ services:
       - ~/volumes/rtu_mirea_vuc_schedule/redis_data:/bitnami/redis/data
   workbook-updater:
     image: ${CI_REGISTRY}/${CI_REGISTRY_USER}/${CI_REGISTRY_IMAGE}:latest
+    pull_policy: always
     build: .
     command: python -m workbook_updater
     restart: on-failure
@@ -27,6 +28,7 @@ services:
       - ./workbook_updater/files:/app/workbook_updater/files
   schedule-service:
     image: ${CI_REGISTRY}/${CI_REGISTRY_USER}/${CI_REGISTRY_IMAGE}:latest
+    pull_policy: always
     build: .
     command: python -m schedule_service
     restart: always

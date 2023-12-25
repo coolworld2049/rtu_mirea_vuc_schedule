@@ -48,18 +48,15 @@ release-image:
     - docker push $CONTAINER_RELEASE_IMAGE
 
 deploy:
-  image: ubuntu:latest
+  image: alpine:latest
   stage: deploy
+  script:
+    - chmod og= $SSH_PRIVATE_KEY
+    - apk update && apk add openssh-client
+    - ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd ~/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit"
+  environment:
+    name: production
+    url: http://$SSH_HOST
   only:
     refs:
       - master
-  before_script:
-    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
-    - mkdir -p ~/.ssh
-    - eval $(ssh-agent -s)
-    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-  script:
-    - ssh-add <(echo "$SSH_PRIVATE_KEY" | tr -d '\r')
-    - ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd ~/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit"
-  after_script:
-    - rm -rf ~/.ssh
