@@ -16,10 +16,9 @@ services:
     volumes:
       - ~/volumes/rtu_mirea_vuc_schedule/redis_data:/bitnami/redis/data
   workbook-updater:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: workbook_updater
+    image: ${CI_REGISTRY}/${CI_REGISTRY_USER}/rtu_mirea_vuc_schedule:latest
+    build: .
+    command: python -m workbook_updater
     restart: on-failure
     hostname: workbook-updater
     env_file:
@@ -27,10 +26,9 @@ services:
     volumes:
       - ./workbook_updater/files:/app/workbook_updater/files
   schedule-service:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      target: schedule_service
+    image: ${CI_REGISTRY}/${CI_REGISTRY_USER}/rtu_mirea_vuc_schedule:latest
+    build: .
+    command: python -m schedule_service
     restart: always
     hostname: schedule-service
     labels:

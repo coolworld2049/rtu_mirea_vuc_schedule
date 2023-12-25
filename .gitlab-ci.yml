@@ -2,8 +2,6 @@ default:
   image: docker:20.10.16
   services:
     - docker:20.10.16-dind
-  before_script:
-    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 stages:
   - build
@@ -14,8 +12,14 @@ stages:
 variables:
   DOCKER_HOST: tcp://docker:2375
   DOCKER_TLS_CERTDIR: ""
-  CONTAINER_TEST_IMAGE: $CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
-  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY_IMAGE:latest
+  CI_REGISTRY: registry.gitlab.com
+  CI_REGISTRY_USER: coolworld2049
+  CI_REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  CONTAINER_TEST_IMAGE: $CI_REGISTRY/$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
+  CONTAINER_RELEASE_IMAGE: $CI_REGISTRY$CI_REGISTRY_IMAGE:latest
+
+before_script:
+  - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
 
 build:
   stage: build
@@ -26,7 +30,9 @@ build:
 test:
   stage: test
   script:
+    - apk update && apk add docker-compose
     - docker pull $CONTAINER_TEST_IMAGE
+    - docker
     - docker run $CONTAINER_TEST_IMAGE poetry run pytest ./schedule_service/tests -v --tb=short
 
 release-image:
