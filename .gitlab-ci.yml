@@ -18,6 +18,9 @@ variables:
   CI_REGISTRY_IMAGE: rtu_mirea_vuc_schedule
   CONTAINER_TEST_IMAGE: $CI_REGISTRY/$CI_REGISTRY_USER/$CI_REGISTRY_IMAGE:$CI_COMMIT_REF_SLUG
   CONTAINER_RELEASE_IMAGE: $CI_REGISTRY/$CI_REGISTRY_USER/$CI_REGISTRY_IMAGE:latest
+  SSH_USER: $SSH_USER
+  SSH_HOST: $SSH_HOST
+  SSH_PRIVATE_KEY: $SSH_PRIVATE_KEY
 
 before_script:
   - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
@@ -44,10 +47,19 @@ release-image:
     - docker tag $CONTAINER_TEST_IMAGE $CONTAINER_RELEASE_IMAGE
     - docker push $CONTAINER_RELEASE_IMAGE
 
-# deploy:
-#  stage: deploy
-#  script:
-#    - ./deploy.sh
-#  only:
-#    - main
-#  environment: production
+deploy:
+  image: ubuntu:latest
+  stage: deploy
+  only:
+    - main
+  before_script:
+    - apt-get -yq update
+    - apt-get -yqq install ssh
+    - install -m 600 -D /dev/null ~/.ssh/id_rsa
+    - echo "$SSH_PRIVATE_KEY" | base64 -d > ~/.ssh/id_rsa
+    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+  script:
+    - bashc -c '[ -f .env ] || cp .env.example .env'
+    - ssh $SSH_USER@$SSH_HOST 'cd $HOME/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit'
+  after_script:
+    - rm -rf ~/.ssh
