@@ -48,15 +48,11 @@ release-image:
     - docker push $CONTAINER_RELEASE_IMAGE
 
 deploy:
-  image: alpine:latest
   stage: deploy
   script:
     - chmod og= $SSH_PRIVATE_KEY
     - apk update && apk add openssh-client
     - ssh -i $SSH_PRIVATE_KEY -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd ~/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit"
-  environment:
-    name: production
-    url: http://$SSH_HOST
   only:
     refs:
       - master
