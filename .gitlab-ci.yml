@@ -60,6 +60,6 @@ deploy:
     - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
     - ssh-add <(echo "$SSH_PRIVATE_KEY" | tr -d '\r')
-    - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd ~/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit"
+    - ssh -v -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa $SSH_USER@$SSH_HOST "cd ~/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit"
   after_script:
     - rm -rf ~/.ssh
