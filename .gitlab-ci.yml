@@ -53,14 +53,13 @@ deploy:
   only:
     refs:
       - master
-      - main
   before_script:
-    - apt-get -yq update
-    - apt-get -yqq install ssh
-    - install -m 600 -D /dev/null ~/.ssh/id_rsa
-    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/id_rsa
-    - ssh-keyscan -H $SSH_HOST > ~/.ssh/known_hosts
+    - 'which ssh-agent || ( apt-get update -y && apt-get install openssh-client -y )'
+    - mkdir -p ~/.ssh
+    - eval $(ssh-agent -s)
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
   script:
-    - ssh $SSH_USER@$SSH_HOST 'cd $HOME/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit'
+    - ssh-add <(echo "$SSH_PRIVATE_KEY" | tr -d '\r')
+    - ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_HOST "cd ~/rtu_mirea_vuc_schedule && docker compose pull && docker compose up -d && exit"
   after_script:
     - rm -rf ~/.ssh
